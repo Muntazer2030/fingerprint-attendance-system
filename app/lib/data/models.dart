@@ -1,0 +1,358 @@
+/// Wire types mirroring docs/protocol.md.
+library;
+
+class DeviceInfo {
+  final String device;
+  final String board;
+  final String eth;
+  final String display;
+  final String firmware;
+  final String idf;
+  final int uptimeSeconds;
+  final String ip;
+  final int epoch;
+  final bool timeSynced;
+  final String timeSource;
+  final EventStats events;
+
+  DeviceInfo({
+    required this.device,
+    required this.board,
+    required this.eth,
+    required this.display,
+    required this.firmware,
+    required this.idf,
+    required this.uptimeSeconds,
+    required this.ip,
+    required this.epoch,
+    required this.timeSynced,
+    required this.timeSource,
+    required this.events,
+  });
+
+  factory DeviceInfo.fromJson(Map<String, dynamic> j) => DeviceInfo(
+    device: j['device'] as String? ?? '',
+    board: j['board'] as String? ?? '',
+    eth: j['eth'] as String? ?? '',
+    display: j['display'] as String? ?? '',
+    firmware: j['fw_version'] as String? ?? '',
+    idf: j['idf'] as String? ?? '',
+    uptimeSeconds: (j['uptime_s'] as num?)?.toInt() ?? 0,
+    ip: j['ip'] as String? ?? '',
+    epoch: (j['epoch'] as num?)?.toInt() ?? 0,
+    timeSynced: j['time_synced'] as bool? ?? false,
+    timeSource: j['time_source'] as String? ?? 'none',
+    events: EventStats.fromJson(
+      (j['events'] as Map?)?.cast<String, dynamic>() ?? const {},
+    ),
+  );
+}
+
+class EventStats {
+  final int head;
+  final int ack;
+  final int pending;
+  final int oldest;
+  final int capacity;
+  final bool overflow;
+
+  EventStats({
+    required this.head,
+    required this.ack,
+    required this.pending,
+    required this.oldest,
+    required this.capacity,
+    required this.overflow,
+  });
+
+  factory EventStats.fromJson(Map<String, dynamic> j) => EventStats(
+    head: (j['head'] as num?)?.toInt() ?? 0,
+    ack: (j['ack'] as num?)?.toInt() ?? 0,
+    pending: (j['pending'] as num?)?.toInt() ?? 0,
+    oldest: (j['oldest'] as num?)?.toInt() ?? 0,
+    capacity: (j['capacity'] as num?)?.toInt() ?? 0,
+    overflow: j['overflow'] as bool? ?? false,
+  );
+
+  double get fillRatio => capacity == 0 ? 0 : pending / capacity;
+}
+
+class Health {
+  final bool ethLink;
+  final bool hasIp;
+  final String ip;
+  final int heapFree;
+  final int heapMin;
+  final int uptimeSeconds;
+  final EventStats events;
+
+  Health({
+    required this.ethLink,
+    required this.hasIp,
+    required this.ip,
+    required this.heapFree,
+    required this.heapMin,
+    required this.uptimeSeconds,
+    required this.events,
+  });
+
+  factory Health.fromJson(Map<String, dynamic> j) => Health(
+    ethLink: j['eth_link'] as bool? ?? false,
+    hasIp: j['has_ip'] as bool? ?? false,
+    ip: j['ip'] as String? ?? '',
+    heapFree: (j['heap_free'] as num?)?.toInt() ?? 0,
+    heapMin: (j['heap_min'] as num?)?.toInt() ?? 0,
+    uptimeSeconds: (j['uptime_s'] as num?)?.toInt() ?? 0,
+    events: EventStats.fromJson(
+      (j['events'] as Map?)?.cast<String, dynamic>() ?? const {},
+    ),
+  );
+}
+
+enum PunchDirection { inbound, outbound }
+
+enum PunchMethod { finger, manual, pin }
+
+class PunchEvent {
+  final int seq;
+  final int epoch;
+  final int employeeId;
+  final int slot;
+  final PunchDirection direction;
+  final PunchMethod method;
+  final bool manual;
+
+  /// The device could not verify its clock when this was recorded (D7).
+  /// Surfaced in the UI rather than silently trusted.
+  final bool provisionalTime;
+
+  PunchEvent({
+    required this.seq,
+    required this.epoch,
+    required this.employeeId,
+    required this.slot,
+    required this.direction,
+    required this.method,
+    required this.manual,
+    required this.provisionalTime,
+  });
+
+  DateTime get timestamp =>
+      DateTime.fromMillisecondsSinceEpoch(epoch * 1000, isUtc: true).toLocal();
+
+  factory PunchEvent.fromJson(Map<String, dynamic> j) => PunchEvent(
+    seq: (j['seq'] as num?)?.toInt() ?? 0,
+    epoch: (j['epoch'] as num?)?.toInt() ?? 0,
+    employeeId: (j['employee_id'] as num?)?.toInt() ?? 0,
+    slot: (j['slot'] as num?)?.toInt() ?? 0,
+    direction: (j['direction'] as String?) == 'out'
+        ? PunchDirection.outbound
+        : PunchDirection.inbound,
+    method: switch (j['method'] as String?) {
+      'manual' => PunchMethod.manual,
+      'pin' => PunchMethod.pin,
+      _ => PunchMethod.finger,
+    },
+    manual: j['manual'] as bool? ?? false,
+    provisionalTime: j['provisional_time'] as bool? ?? false,
+  );
+}
+
+class Employee {
+  final int id;
+  final bool active;
+  final PunchDirection lastDirection;
+  final int lastEpoch;
+
+  /// Consecutive failed matches. A climbing count means the finger is
+  /// degrading; catching it here avoids a daily support call (D5).
+  final int failCount;
+  final int fingers;
+
+  Employee({
+    required this.id,
+    required this.active,
+    required this.lastDirection,
+    required this.lastEpoch,
+    required this.failCount,
+    required this.fingers,
+  });
+
+  factory Employee.fromJson(Map<String, dynamic> j) => Employee(
+    id: (j['employee_id'] as num?)?.toInt() ?? 0,
+    active: j['active'] as bool? ?? true,
+    lastDirection: (j['last_direction'] as String?) == 'out'
+        ? PunchDirection.outbound
+        : PunchDirection.inbound,
+    lastEpoch: (j['last_epoch'] as num?)?.toInt() ?? 0,
+    failCount: (j['fail_count'] as num?)?.toInt() ?? 0,
+    fingers: (j['fingers'] as num?)?.toInt() ?? 0,
+  );
+
+  /// Whether this person is currently on site, by their last punch.
+  bool get isPresent =>
+      lastEpoch > 0 && lastDirection == PunchDirection.inbound;
+}
+
+enum EnrollState {
+  idle,
+  waitingFinger,
+  liftFinger,
+  waitingFingerAgain,
+  merging,
+  stored,
+  failed,
+}
+
+class EnrollStatus {
+  final int sessionId;
+  final EnrollState state;
+  final int? slot;
+  final String? reason;
+
+  EnrollStatus({
+    required this.sessionId,
+    required this.state,
+    this.slot,
+    this.reason,
+  });
+
+  bool get isRunning =>
+      state != EnrollState.idle &&
+      state != EnrollState.stored &&
+      state != EnrollState.failed;
+
+  factory EnrollStatus.fromJson(Map<String, dynamic> j) => EnrollStatus(
+    sessionId: (j['session_id'] as num?)?.toInt() ?? 0,
+    state: switch (j['state'] as String?) {
+      'waiting_finger' => EnrollState.waitingFinger,
+      'lift_finger' => EnrollState.liftFinger,
+      'waiting_finger_again' => EnrollState.waitingFingerAgain,
+      'merging' => EnrollState.merging,
+      'stored' => EnrollState.stored,
+      'failed' => EnrollState.failed,
+      _ => EnrollState.idle,
+    },
+    slot: (j['slot'] as num?)?.toInt(),
+    reason: j['reason'] as String?,
+  );
+}
+
+/// Everything about the terminal an operator can change without a reflash.
+/// Mirrors device_cfg_t in firmware/main/cfg.h.
+class DeviceConfig {
+  final String language; // 'en' | 'ar'
+  final bool time12h;
+  final bool showSeconds;
+  final int tzOffsetMin;
+  final int brightness; // 1..255
+  final bool buzzer;
+  final int dupWindowSeconds;
+  final int idleDimSeconds;
+  final int idleOffSeconds;
+
+  /// False makes the device poll the sensor instead of trusting the wake pin.
+  /// Needed when the sensor's touch wires are not connected, since the ESP32's
+  /// input-only pins float without them.
+  final bool useFingerDetect;
+
+  /// False ignores the TTP223 entirely. GPIO35 has no internal pull, so an
+  /// unwired button floats and triggers spurious direction overrides.
+  final bool useTouchButton;
+
+  /// Fixed: every scan records [directionOut]; the screen can always say which.
+  /// Auto: each employee alternates IN and OUT.
+  final bool directionAuto;
+  final bool directionOut;
+
+  final bool hasStrings;
+  final int stringSlots;
+
+  const DeviceConfig({
+    this.directionAuto = false,
+    this.directionOut = false,
+    required this.language,
+    required this.time12h,
+    required this.showSeconds,
+    required this.tzOffsetMin,
+    required this.brightness,
+    required this.buzzer,
+    required this.dupWindowSeconds,
+    required this.idleDimSeconds,
+    required this.idleOffSeconds,
+    required this.useFingerDetect,
+    required this.useTouchButton,
+    required this.hasStrings,
+    required this.stringSlots,
+  });
+
+  factory DeviceConfig.fromJson(Map<String, dynamic> j) => DeviceConfig(
+    language: j['language'] as String? ?? 'en',
+    time12h: j['time_12h'] as bool? ?? false,
+    showSeconds: j['show_seconds'] as bool? ?? false,
+    tzOffsetMin: (j['tz_offset_min'] as num?)?.toInt() ?? 0,
+    brightness: (j['brightness'] as num?)?.toInt() ?? 128,
+    buzzer: j['buzzer'] as bool? ?? true,
+    dupWindowSeconds: (j['dup_window_s'] as num?)?.toInt() ?? 60,
+    idleDimSeconds: (j['idle_dim_s'] as num?)?.toInt() ?? 20,
+    idleOffSeconds: (j['idle_off_s'] as num?)?.toInt() ?? 120,
+    useFingerDetect: j['use_finger_detect'] as bool? ?? true,
+    useTouchButton: j['use_touch_button'] as bool? ?? true,
+    directionAuto: (j['direction_mode'] as String?) == 'auto',
+    directionOut: (j['direction'] as String?) == 'out',
+    hasStrings: j['has_strings'] as bool? ?? false,
+    stringSlots: (j['string_slots'] as num?)?.toInt() ?? 0,
+  );
+
+  DeviceConfig copyWith({
+    String? language,
+    bool? time12h,
+    bool? showSeconds,
+    int? tzOffsetMin,
+    int? brightness,
+    bool? buzzer,
+    int? dupWindowSeconds,
+    int? idleDimSeconds,
+    int? idleOffSeconds,
+    bool? useFingerDetect,
+    bool? useTouchButton,
+    bool? directionAuto,
+    bool? directionOut,
+  }) => DeviceConfig(
+    directionAuto: directionAuto ?? this.directionAuto,
+    directionOut: directionOut ?? this.directionOut,
+    language: language ?? this.language,
+    time12h: time12h ?? this.time12h,
+    showSeconds: showSeconds ?? this.showSeconds,
+    tzOffsetMin: tzOffsetMin ?? this.tzOffsetMin,
+    brightness: brightness ?? this.brightness,
+    buzzer: buzzer ?? this.buzzer,
+    dupWindowSeconds: dupWindowSeconds ?? this.dupWindowSeconds,
+    idleDimSeconds: idleDimSeconds ?? this.idleDimSeconds,
+    idleOffSeconds: idleOffSeconds ?? this.idleOffSeconds,
+    useFingerDetect: useFingerDetect ?? this.useFingerDetect,
+    useTouchButton: useTouchButton ?? this.useTouchButton,
+    hasStrings: hasStrings,
+    stringSlots: stringSlots,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'language': language,
+    'time_12h': time12h,
+    'show_seconds': showSeconds,
+    'tz_offset_min': tzOffsetMin,
+    'brightness': brightness,
+    'buzzer': buzzer,
+    'dup_window_s': dupWindowSeconds,
+    'idle_dim_s': idleDimSeconds,
+    'idle_off_s': idleOffSeconds,
+    'use_finger_detect': useFingerDetect,
+    'use_touch_button': useTouchButton,
+    'direction_mode': directionAuto ? 'auto' : 'fixed',
+    'direction': directionOut ? 'out' : 'in',
+  };
+
+  /// Both burn-in mitigations off is allowed but unwise on an OLED that shows
+  /// near-static content around the clock.
+  bool get burnInRisk => idleDimSeconds == 0 && idleOffSeconds == 0;
+}

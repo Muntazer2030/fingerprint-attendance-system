@@ -1,0 +1,24 @@
+# ESP-IDF
+firmware/build/
+firmware/build_c3/
+firmware/build_oldpc/
+firmware/managed_components/
+firmware/sdkconfig
+firmware/sdkconfig.old
+# per-machine editor settings, and scratch files left at the firmware root
+firmware/.vscode/
+firmware/evlog.c
+firmware/g.c
+# keep: sdkconfig.defaults, dependencies.lock
+
+# Flutter
+app/build/
+app/.dart_tool/
+app/windows/flutter/ephemeral/
+*.iml
+
+# secrets -- device tokens, Apps Script URLs, OAuth client files
+*.local.json
+secrets/
+credentials.json
+token.json

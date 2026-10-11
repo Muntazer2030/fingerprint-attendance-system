@@ -1,0 +1,6 @@
+dependencies:
+  idf: ">=5.0"
+  # enc28j60 is vendored under components/enc28j60 -- see its README for the
+  # two local fixes that the registry version does not have.
+  # cJSON left IDF core in 6.x and now ships from the registry.
+  espressif/cjson: "^1.7.19"

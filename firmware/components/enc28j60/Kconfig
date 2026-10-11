@@ -1,0 +1,20 @@
+menu "ENC28J60 (vendored)"
+
+config ENC28J60_POLL_MS
+    int "Service the chip every N ms regardless of the INT line (0 = interrupt only)"
+    default 20
+    range 0 1000
+    help
+      Upstream relies entirely on the INT pin. If that line is unwired, noisy,
+      or misses an edge, transmit-complete is never serviced and the ENC28J60
+      transmit engine can stay locked with TXRTS asserted -- the link looks up
+      but nothing can be sent.
+
+      With a non-zero value the driver also wakes on this interval and reads
+      the interrupt flags over SPI. Interrupts still work and still shorten the
+      wait, so this is a floor rather than a replacement. 20 ms costs two
+      register reads per poll and makes the INT wire optional.
+
+      Set 0 to restore upstream interrupt-only behaviour.
+
+endmenu

@@ -1,0 +1,264 @@
+menu "Attendance Terminal"
+
+choice ATT_BOARD
+    prompt "Target board"
+    default ATT_BOARD_WROOM32 if IDF_TARGET_ESP32
+    default ATT_BOARD_C3 if IDF_TARGET_ESP32C3
+    help
+      Selects the default pin map. Individual pins can still be overridden.
+
+config ATT_BOARD_WROOM32
+    bool "ESP32-WROOM-32 (dual core, recommended)"
+    depends on IDF_TARGET_ESP32
+
+config ATT_BOARD_C3
+    bool "ESP32-C3 devkit (single core, tight pin budget)"
+    depends on IDF_TARGET_ESP32C3
+
+config ATT_BOARD_C3_SUPERMINI
+    bool "ESP32-C3 SuperMini (13 GPIO, no buzzer)"
+    depends on IDF_TARGET_ESP32C3
+    help
+      The SuperMini exposes GPIO 0-10, 20 and 21 only. GPIO18/19 are the
+      native USB pins and are not broken out, which is also why 20/21 are
+      free -- the console arrives over USB rather than a UART.
+
+      GPIO2, 8 and 9 are strapping pins. GPIO2 in particular MUST be high at
+      reset or the chip does not boot at all -- no USB, no console, no network,
+      which reads as a dead board rather than a wiring fault.
+
+      The sensor's yellow detect output idles low whenever no finger is on the
+      platen, so it cannot live on GPIO2. There is no non-strapping pin spare,
+      so this board polls the sensor over UART instead: ATT_PIN_FPM_DETECT is
+      -1 and the yellow wire is left unconnected.
+
+      The TTP223 on GPIO8 idles low too. That is harmless for a normal boot,
+      where GPIO8 is ignored, but download boot requires GPIO8 high -- so
+      unplug its signal wire if flashing will not start.
+endchoice
+
+choice ATT_ETH_CHIP
+    prompt "Ethernet controller"
+    default ATT_ETH_ENC28J60
+config ATT_ETH_ENC28J60
+    bool "ENC28J60 (10 Mbps, external managed component)"
+config ATT_ETH_W5500
+    bool "W5500 (100 Mbps, in ESP-IDF core)"
+endchoice
+
+menu "Pin map"
+
+config ATT_PIN_SPI_SCLK
+    int "SPI SCLK"
+    default 18 if ATT_BOARD_WROOM32
+    default 4 if ATT_BOARD_C3_SUPERMINI
+    default 4  if ATT_BOARD_C3
+
+config ATT_PIN_SPI_MOSI
+    int "SPI MOSI"
+    default 23 if ATT_BOARD_WROOM32
+    default 6 if ATT_BOARD_C3_SUPERMINI
+    default 6  if ATT_BOARD_C3
+
+config ATT_PIN_SPI_MISO
+    int "SPI MISO"
+    default 19 if ATT_BOARD_WROOM32
+    default 5 if ATT_BOARD_C3_SUPERMINI
+    default 5  if ATT_BOARD_C3
+
+config ATT_PIN_ETH_CS
+    int "Ethernet CS"
+    default 5 if ATT_BOARD_WROOM32
+    default 7 if ATT_BOARD_C3_SUPERMINI
+    default 7 if ATT_BOARD_C3
+
+config ATT_PIN_ETH_INT
+    int "Ethernet INT"
+    default 4  if ATT_BOARD_WROOM32
+    default 10 if ATT_BOARD_C3_SUPERMINI
+    default 10 if ATT_BOARD_C3
+
+config ATT_PIN_ETH_RST
+    int "Ethernet RST (-1 = tied to EN)"
+    default 26 if ATT_BOARD_WROOM32
+    default 3 if ATT_BOARD_C3_SUPERMINI
+    default -1 if ATT_BOARD_C3
+
+config ATT_PIN_I2C_SDA
+    int "I2C SDA (OLED, and RTC if fitted)"
+    default 21 if ATT_BOARD_WROOM32
+    default 0 if ATT_BOARD_C3_SUPERMINI
+    default 0  if ATT_BOARD_C3
+
+config ATT_PIN_I2C_SCL
+    int "I2C SCL (OLED, and RTC if fitted)"
+    default 22 if ATT_BOARD_WROOM32
+    default 1 if ATT_BOARD_C3_SUPERMINI
+    default 1  if ATT_BOARD_C3
+
+config ATT_I2C_FREQ_HZ
+    int "I2C clock (Hz)"
+    default 400000
+    help
+      400 kHz is the practical max for most OLED modules. A full 128x128
+      4bpp frame is 8 KB, ~184 ms at this speed -- use partial updates.
+
+config ATT_PIN_FPM_TX
+    int "FPM12 TX (ESP -> sensor, the sensor's white wire)"
+    default 17 if ATT_BOARD_WROOM32
+    default 20 if ATT_BOARD_C3_SUPERMINI
+    default 18 if ATT_BOARD_C3
+
+config ATT_PIN_FPM_RX
+    int "FPM12 RX (ESP <- sensor, the sensor's green wire)"
+    default 16 if ATT_BOARD_WROOM32
+    default 21 if ATT_BOARD_C3_SUPERMINI
+    default 19 if ATT_BOARD_C3
+
+config ATT_PIN_FPM_DETECT
+    int "FPM12 finger-detect input (-1 = poll)"
+    default 34 if ATT_BOARD_WROOM32
+    default -1 if ATT_BOARD_C3_SUPERMINI
+    default 3  if ATT_BOARD_C3
+
+config ATT_PIN_TOUCH
+    int "TTP223 touch input"
+    default 35 if ATT_BOARD_WROOM32
+    default 8 if ATT_BOARD_C3_SUPERMINI
+    default 2  if ATT_BOARD_C3
+
+config ATT_PIN_BUZZER
+    int "Buzzer"
+    default 32 if ATT_BOARD_WROOM32
+    default -1 if ATT_BOARD_C3_SUPERMINI
+    default 8  if ATT_BOARD_C3
+
+config ATT_PIN_LED
+    int "Status LED (-1 = none)"
+    default 25 if ATT_BOARD_WROOM32
+    default -1 if ATT_BOARD_C3_SUPERMINI
+    default -1 if ATT_BOARD_C3
+
+endmenu
+
+choice ATT_OLED
+    prompt "OLED controller"
+    default ATT_OLED_SH1106
+    help
+      Confirmed hardware: 1.3in 128x64 white I2C module, SH1106 controller.
+
+      SH1106 has 132 columns of RAM against a 128-pixel panel, so all writes
+      need a 2-column offset. Driving it with an SSD1306 driver "works" but
+      shifts the image by 2 px and wraps the right edge -- a classic and
+      easily-misdiagnosed symptom.
+
+config ATT_OLED_SSD1327
+    bool "SSD1327 128x128 4bpp greyscale"
+config ATT_OLED_SSD1306
+    bool "SSD1306 128x64 mono"
+config ATT_OLED_SH1106
+    bool "SH1106 128x64 mono (132-col offset)"
+config ATT_OLED_SSD1309
+    bool "SSD1309 128x64 mono (1.5in, SSD1306-compatible commands)"
+endchoice
+
+config ATT_OLED_ADDR
+    hex "OLED I2C address"
+    default 0x3C
+
+config ATT_OLED_IDLE_DIM_S
+    int "Dim display after N seconds idle (0 = never)"
+    default 20
+    help
+      OLED burn-in protection. An attendance terminal shows near-static
+      content 24/7; without dimming plus pixel-shift the idle screen will
+      ghost permanently within a couple of years.
+
+config ATT_OLED_IDLE_OFF_S
+    int "Blank display after N seconds idle (0 = never)"
+    default 120
+
+menu "Network"
+
+config ATT_NET_DHCP_TIMEOUT_S
+    int "Fall back to a static IP after N seconds without a DHCP lease"
+    default 15
+    help
+      A deployed terminal that becomes unreachable because the router's DHCP
+      hiccuped is a support call. After this timeout the device self-assigns
+      the static address below so it can always be reached. Set 0 to disable
+      the fallback and wait for DHCP indefinitely.
+
+config ATT_ETH_WATCHDOG_S
+    int "Check the network every N seconds (0 = disabled)"
+    default 30
+    help
+      Pings the gateway. Three consecutive failures while the link is up mean
+      the ENC28J60 has wedged its receive buffer, which only a hardware reset
+      clears. Punches keep recording locally throughout; this restores syncing.
+
+config ATT_NET_STATIC_IP
+    string "Static fallback IP"
+    default "192.168.137.50"
+    help
+      Default suits Windows Internet Connection Sharing, which puts the shared
+      adapter on 192.168.137.1/24.
+
+config ATT_NET_STATIC_NETMASK
+    string "Static fallback netmask"
+    default "255.255.255.0"
+
+config ATT_NET_STATIC_GW
+    string "Static fallback gateway"
+    default "192.168.137.1"
+
+endmenu
+
+config ATT_FPM_BAUD
+    int "FPM12 UART baud"
+    default 57600
+
+config ATT_DUP_WINDOW_S
+    int "Suppress repeat punches from the same employee within N seconds"
+    default 60
+    help
+      Stops a second scan seconds after the first from flipping someone
+      straight back out again.
+
+config ATT_TZ_OFFSET_MIN
+    int "Local time offset from UTC, in minutes"
+    default 180
+    help
+      Display only -- events are always stored in UTC and the PC applies the
+      timezone for reports. 180 = UTC+3. Change to match your location.
+
+config ATT_EVLOG_SELFTEST
+    bool "Run the event-log self test at boot"
+    default n
+    help
+      Appends a few synthetic records, reads them back and verifies CRC and
+      sequencing against real flash. Useful during bring-up.
+
+      TURN THIS OFF BEFORE DEPLOYMENT -- the synthetic records are real log
+      entries and will sync to the PC as if they were punches.
+
+config ATT_MAX_EMPLOYEES
+    int "Maximum employees"
+    default 64
+
+config ATT_MAX_SLOTS
+    int "Maximum fingerprint template slots"
+    default 240
+    help
+      Employees may enrol several fingers, so slots > employees.
+
+      The fitted FPM12 reports a 240-template library, not the 1000 the vendor
+      page advertises. That is a hard ceiling:
+        3 fingers/employee -> 80 staff max
+        2 fingers/employee -> 120 staff max
+      At the target of 50 staff x 3 fingers = 150, 90 slots remain spare.
+
+      Only used as a fallback; the driver searches the size the sensor
+      actually reports at boot.
+
+endmenu

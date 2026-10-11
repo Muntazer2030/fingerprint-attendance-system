@@ -1,0 +1,18 @@
+# Overlay for the ESP32-C3 SuperMini. Use with:
+#   idf.py -B build_c3 -D SDKCONFIG=build_c3/sdkconfig \
+#          -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.c3supermini" \
+#          set-target esp32c3 build
+
+CONFIG_ATT_BOARD_C3_SUPERMINI=y
+CONFIG_ATT_OLED_SH1106=y
+
+# The console MUST move off UART0.
+#
+# By default IDF puts the console on GPIO20/21, which are the only pins left
+# for the fingerprint sensor on this board -- the two fight and the sensor
+# never answers. The SuperMini has native USB, so route the console there and
+# free the UART. This is also how the board is meant to be used: it has a
+# USB-C connector and no USB-serial bridge chip.
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_CONSOLE_UART_DEFAULT=n
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
