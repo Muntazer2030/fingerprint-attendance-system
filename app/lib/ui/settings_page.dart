@@ -4,6 +4,7 @@ import '../data/api_client.dart';
 import '../data/device_scanner.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
+import 'lock_page.dart';
 import 'theme.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -117,6 +118,23 @@ class _SettingsPageState extends State<SettingsPage> {
       if (mounted) setState(() => _probing = false);
       api.close();
     }
+  }
+
+  Future<void> _password(PasswordAction action) async {
+    final l = AppLocalizations.of(context)!;
+    final done = await showDialog<bool>(
+      context: context,
+      builder: (_) =>
+          PasswordDialog(action: action, settings: SettingsScope.of(context)),
+    );
+    if (done != true || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          action == PasswordAction.remove ? l.passwordRemoved : l.passwordSaved,
+        ),
+      ),
+    );
   }
 
   @override
@@ -252,6 +270,43 @@ class _SettingsPageState extends State<SettingsPage> {
                 selected: {settings.themeMode},
                 onSelectionChanged: (sel) => settings.setThemeMode(sel.first),
               ),
+              if (!widget.firstRun) ...[
+                const SizedBox(height: 28),
+                Text(
+                  l.appPassword,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  settings.hasPassword ? l.appPasswordHint : l.appPasswordOff,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    if (!settings.hasPassword)
+                      FilledButton.tonalIcon(
+                        onPressed: () => _password(PasswordAction.set),
+                        icon: const Icon(Icons.lock_outline),
+                        label: Text(l.setPassword),
+                      )
+                    else ...[
+                      FilledButton.tonalIcon(
+                        onPressed: () => _password(PasswordAction.change),
+                        icon: const Icon(Icons.key_outlined),
+                        label: Text(l.changePassword),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: () => _password(PasswordAction.remove),
+                        icon: const Icon(Icons.lock_open_outlined),
+                        label: Text(l.removePassword),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
             ],
           ),
         ),

@@ -2863,6 +2863,1544 @@ class MetaCompanion extends UpdateCompanion<MetaRow> {
   }
 }
 
+class $WagesTable extends Wages with TableInfo<$WagesTable, WageRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _employeeIdMeta = const VerificationMeta(
+    'employeeId',
+  );
+  @override
+  late final GeneratedColumn<int> employeeId = GeneratedColumn<int>(
+    'employee_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fromMonthMeta = const VerificationMeta(
+    'fromMonth',
+  );
+  @override
+  late final GeneratedColumn<int> fromMonth = GeneratedColumn<int>(
+    'from_month',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<int> kind = GeneratedColumn<int>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountCentsMeta = const VerificationMeta(
+    'amountCents',
+  );
+  @override
+  late final GeneratedColumn<int> amountCents = GeneratedColumn<int>(
+    'amount_cents',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    employeeId,
+    fromMonth,
+    kind,
+    amountCents,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'wages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WageRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('employee_id')) {
+      context.handle(
+        _employeeIdMeta,
+        employeeId.isAcceptableOrUnknown(data['employee_id']!, _employeeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_employeeIdMeta);
+    }
+    if (data.containsKey('from_month')) {
+      context.handle(
+        _fromMonthMeta,
+        fromMonth.isAcceptableOrUnknown(data['from_month']!, _fromMonthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fromMonthMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('amount_cents')) {
+      context.handle(
+        _amountCentsMeta,
+        amountCents.isAcceptableOrUnknown(
+          data['amount_cents']!,
+          _amountCentsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_amountCentsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {employeeId, fromMonth};
+  @override
+  WageRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WageRow(
+      employeeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}employee_id'],
+      )!,
+      fromMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}from_month'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}kind'],
+      )!,
+      amountCents: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_cents'],
+      )!,
+    );
+  }
+
+  @override
+  $WagesTable createAlias(String alias) {
+    return $WagesTable(attachedDatabase, alias);
+  }
+}
+
+class WageRow extends DataClass implements Insertable<WageRow> {
+  final int employeeId;
+
+  /// yyyymm the wage starts.
+  final int fromMonth;
+
+  /// 0 = monthly salary, 1 = per day, 2 = per hour.
+  final int kind;
+
+  /// Hundredths of the currency unit, so money never passes through a float
+  /// in storage.
+  final int amountCents;
+  const WageRow({
+    required this.employeeId,
+    required this.fromMonth,
+    required this.kind,
+    required this.amountCents,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['employee_id'] = Variable<int>(employeeId);
+    map['from_month'] = Variable<int>(fromMonth);
+    map['kind'] = Variable<int>(kind);
+    map['amount_cents'] = Variable<int>(amountCents);
+    return map;
+  }
+
+  WagesCompanion toCompanion(bool nullToAbsent) {
+    return WagesCompanion(
+      employeeId: Value(employeeId),
+      fromMonth: Value(fromMonth),
+      kind: Value(kind),
+      amountCents: Value(amountCents),
+    );
+  }
+
+  factory WageRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WageRow(
+      employeeId: serializer.fromJson<int>(json['employeeId']),
+      fromMonth: serializer.fromJson<int>(json['fromMonth']),
+      kind: serializer.fromJson<int>(json['kind']),
+      amountCents: serializer.fromJson<int>(json['amountCents']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'employeeId': serializer.toJson<int>(employeeId),
+      'fromMonth': serializer.toJson<int>(fromMonth),
+      'kind': serializer.toJson<int>(kind),
+      'amountCents': serializer.toJson<int>(amountCents),
+    };
+  }
+
+  WageRow copyWith({
+    int? employeeId,
+    int? fromMonth,
+    int? kind,
+    int? amountCents,
+  }) => WageRow(
+    employeeId: employeeId ?? this.employeeId,
+    fromMonth: fromMonth ?? this.fromMonth,
+    kind: kind ?? this.kind,
+    amountCents: amountCents ?? this.amountCents,
+  );
+  WageRow copyWithCompanion(WagesCompanion data) {
+    return WageRow(
+      employeeId: data.employeeId.present
+          ? data.employeeId.value
+          : this.employeeId,
+      fromMonth: data.fromMonth.present ? data.fromMonth.value : this.fromMonth,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      amountCents: data.amountCents.present
+          ? data.amountCents.value
+          : this.amountCents,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WageRow(')
+          ..write('employeeId: $employeeId, ')
+          ..write('fromMonth: $fromMonth, ')
+          ..write('kind: $kind, ')
+          ..write('amountCents: $amountCents')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(employeeId, fromMonth, kind, amountCents);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WageRow &&
+          other.employeeId == this.employeeId &&
+          other.fromMonth == this.fromMonth &&
+          other.kind == this.kind &&
+          other.amountCents == this.amountCents);
+}
+
+class WagesCompanion extends UpdateCompanion<WageRow> {
+  final Value<int> employeeId;
+  final Value<int> fromMonth;
+  final Value<int> kind;
+  final Value<int> amountCents;
+  final Value<int> rowid;
+  const WagesCompanion({
+    this.employeeId = const Value.absent(),
+    this.fromMonth = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.amountCents = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WagesCompanion.insert({
+    required int employeeId,
+    required int fromMonth,
+    required int kind,
+    required int amountCents,
+    this.rowid = const Value.absent(),
+  }) : employeeId = Value(employeeId),
+       fromMonth = Value(fromMonth),
+       kind = Value(kind),
+       amountCents = Value(amountCents);
+  static Insertable<WageRow> custom({
+    Expression<int>? employeeId,
+    Expression<int>? fromMonth,
+    Expression<int>? kind,
+    Expression<int>? amountCents,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (employeeId != null) 'employee_id': employeeId,
+      if (fromMonth != null) 'from_month': fromMonth,
+      if (kind != null) 'kind': kind,
+      if (amountCents != null) 'amount_cents': amountCents,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WagesCompanion copyWith({
+    Value<int>? employeeId,
+    Value<int>? fromMonth,
+    Value<int>? kind,
+    Value<int>? amountCents,
+    Value<int>? rowid,
+  }) {
+    return WagesCompanion(
+      employeeId: employeeId ?? this.employeeId,
+      fromMonth: fromMonth ?? this.fromMonth,
+      kind: kind ?? this.kind,
+      amountCents: amountCents ?? this.amountCents,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (employeeId.present) {
+      map['employee_id'] = Variable<int>(employeeId.value);
+    }
+    if (fromMonth.present) {
+      map['from_month'] = Variable<int>(fromMonth.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<int>(kind.value);
+    }
+    if (amountCents.present) {
+      map['amount_cents'] = Variable<int>(amountCents.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WagesCompanion(')
+          ..write('employeeId: $employeeId, ')
+          ..write('fromMonth: $fromMonth, ')
+          ..write('kind: $kind, ')
+          ..write('amountCents: $amountCents, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PayAdjustmentsTable extends PayAdjustments
+    with TableInfo<$PayAdjustmentsTable, PayAdjustmentRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PayAdjustmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _employeeIdMeta = const VerificationMeta(
+    'employeeId',
+  );
+  @override
+  late final GeneratedColumn<int> employeeId = GeneratedColumn<int>(
+    'employee_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _monthKeyMeta = const VerificationMeta(
+    'monthKey',
+  );
+  @override
+  late final GeneratedColumn<int> monthKey = GeneratedColumn<int>(
+    'month_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<int> kind = GeneratedColumn<int>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountCentsMeta = const VerificationMeta(
+    'amountCents',
+  );
+  @override
+  late final GeneratedColumn<int> amountCents = GeneratedColumn<int>(
+    'amount_cents',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _atEpochMeta = const VerificationMeta(
+    'atEpoch',
+  );
+  @override
+  late final GeneratedColumn<int> atEpoch = GeneratedColumn<int>(
+    'at_epoch',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    employeeId,
+    monthKey,
+    kind,
+    amountCents,
+    note,
+    atEpoch,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pay_adjustments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PayAdjustmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('employee_id')) {
+      context.handle(
+        _employeeIdMeta,
+        employeeId.isAcceptableOrUnknown(data['employee_id']!, _employeeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_employeeIdMeta);
+    }
+    if (data.containsKey('month_key')) {
+      context.handle(
+        _monthKeyMeta,
+        monthKey.isAcceptableOrUnknown(data['month_key']!, _monthKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_monthKeyMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('amount_cents')) {
+      context.handle(
+        _amountCentsMeta,
+        amountCents.isAcceptableOrUnknown(
+          data['amount_cents']!,
+          _amountCentsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_amountCentsMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('at_epoch')) {
+      context.handle(
+        _atEpochMeta,
+        atEpoch.isAcceptableOrUnknown(data['at_epoch']!, _atEpochMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_atEpochMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PayAdjustmentRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PayAdjustmentRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      employeeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}employee_id'],
+      )!,
+      monthKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}month_key'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}kind'],
+      )!,
+      amountCents: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_cents'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      )!,
+      atEpoch: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}at_epoch'],
+      )!,
+    );
+  }
+
+  @override
+  $PayAdjustmentsTable createAlias(String alias) {
+    return $PayAdjustmentsTable(attachedDatabase, alias);
+  }
+}
+
+class PayAdjustmentRow extends DataClass
+    implements Insertable<PayAdjustmentRow> {
+  final int id;
+  final int employeeId;
+  final int monthKey;
+
+  /// 0 = bonus, 1 = deduction, 2 = advance.
+  final int kind;
+  final int amountCents;
+  final String note;
+  final int atEpoch;
+  const PayAdjustmentRow({
+    required this.id,
+    required this.employeeId,
+    required this.monthKey,
+    required this.kind,
+    required this.amountCents,
+    required this.note,
+    required this.atEpoch,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['employee_id'] = Variable<int>(employeeId);
+    map['month_key'] = Variable<int>(monthKey);
+    map['kind'] = Variable<int>(kind);
+    map['amount_cents'] = Variable<int>(amountCents);
+    map['note'] = Variable<String>(note);
+    map['at_epoch'] = Variable<int>(atEpoch);
+    return map;
+  }
+
+  PayAdjustmentsCompanion toCompanion(bool nullToAbsent) {
+    return PayAdjustmentsCompanion(
+      id: Value(id),
+      employeeId: Value(employeeId),
+      monthKey: Value(monthKey),
+      kind: Value(kind),
+      amountCents: Value(amountCents),
+      note: Value(note),
+      atEpoch: Value(atEpoch),
+    );
+  }
+
+  factory PayAdjustmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PayAdjustmentRow(
+      id: serializer.fromJson<int>(json['id']),
+      employeeId: serializer.fromJson<int>(json['employeeId']),
+      monthKey: serializer.fromJson<int>(json['monthKey']),
+      kind: serializer.fromJson<int>(json['kind']),
+      amountCents: serializer.fromJson<int>(json['amountCents']),
+      note: serializer.fromJson<String>(json['note']),
+      atEpoch: serializer.fromJson<int>(json['atEpoch']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'employeeId': serializer.toJson<int>(employeeId),
+      'monthKey': serializer.toJson<int>(monthKey),
+      'kind': serializer.toJson<int>(kind),
+      'amountCents': serializer.toJson<int>(amountCents),
+      'note': serializer.toJson<String>(note),
+      'atEpoch': serializer.toJson<int>(atEpoch),
+    };
+  }
+
+  PayAdjustmentRow copyWith({
+    int? id,
+    int? employeeId,
+    int? monthKey,
+    int? kind,
+    int? amountCents,
+    String? note,
+    int? atEpoch,
+  }) => PayAdjustmentRow(
+    id: id ?? this.id,
+    employeeId: employeeId ?? this.employeeId,
+    monthKey: monthKey ?? this.monthKey,
+    kind: kind ?? this.kind,
+    amountCents: amountCents ?? this.amountCents,
+    note: note ?? this.note,
+    atEpoch: atEpoch ?? this.atEpoch,
+  );
+  PayAdjustmentRow copyWithCompanion(PayAdjustmentsCompanion data) {
+    return PayAdjustmentRow(
+      id: data.id.present ? data.id.value : this.id,
+      employeeId: data.employeeId.present
+          ? data.employeeId.value
+          : this.employeeId,
+      monthKey: data.monthKey.present ? data.monthKey.value : this.monthKey,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      amountCents: data.amountCents.present
+          ? data.amountCents.value
+          : this.amountCents,
+      note: data.note.present ? data.note.value : this.note,
+      atEpoch: data.atEpoch.present ? data.atEpoch.value : this.atEpoch,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PayAdjustmentRow(')
+          ..write('id: $id, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('monthKey: $monthKey, ')
+          ..write('kind: $kind, ')
+          ..write('amountCents: $amountCents, ')
+          ..write('note: $note, ')
+          ..write('atEpoch: $atEpoch')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, employeeId, monthKey, kind, amountCents, note, atEpoch);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PayAdjustmentRow &&
+          other.id == this.id &&
+          other.employeeId == this.employeeId &&
+          other.monthKey == this.monthKey &&
+          other.kind == this.kind &&
+          other.amountCents == this.amountCents &&
+          other.note == this.note &&
+          other.atEpoch == this.atEpoch);
+}
+
+class PayAdjustmentsCompanion extends UpdateCompanion<PayAdjustmentRow> {
+  final Value<int> id;
+  final Value<int> employeeId;
+  final Value<int> monthKey;
+  final Value<int> kind;
+  final Value<int> amountCents;
+  final Value<String> note;
+  final Value<int> atEpoch;
+  const PayAdjustmentsCompanion({
+    this.id = const Value.absent(),
+    this.employeeId = const Value.absent(),
+    this.monthKey = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.amountCents = const Value.absent(),
+    this.note = const Value.absent(),
+    this.atEpoch = const Value.absent(),
+  });
+  PayAdjustmentsCompanion.insert({
+    this.id = const Value.absent(),
+    required int employeeId,
+    required int monthKey,
+    required int kind,
+    required int amountCents,
+    this.note = const Value.absent(),
+    required int atEpoch,
+  }) : employeeId = Value(employeeId),
+       monthKey = Value(monthKey),
+       kind = Value(kind),
+       amountCents = Value(amountCents),
+       atEpoch = Value(atEpoch);
+  static Insertable<PayAdjustmentRow> custom({
+    Expression<int>? id,
+    Expression<int>? employeeId,
+    Expression<int>? monthKey,
+    Expression<int>? kind,
+    Expression<int>? amountCents,
+    Expression<String>? note,
+    Expression<int>? atEpoch,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (employeeId != null) 'employee_id': employeeId,
+      if (monthKey != null) 'month_key': monthKey,
+      if (kind != null) 'kind': kind,
+      if (amountCents != null) 'amount_cents': amountCents,
+      if (note != null) 'note': note,
+      if (atEpoch != null) 'at_epoch': atEpoch,
+    });
+  }
+
+  PayAdjustmentsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? employeeId,
+    Value<int>? monthKey,
+    Value<int>? kind,
+    Value<int>? amountCents,
+    Value<String>? note,
+    Value<int>? atEpoch,
+  }) {
+    return PayAdjustmentsCompanion(
+      id: id ?? this.id,
+      employeeId: employeeId ?? this.employeeId,
+      monthKey: monthKey ?? this.monthKey,
+      kind: kind ?? this.kind,
+      amountCents: amountCents ?? this.amountCents,
+      note: note ?? this.note,
+      atEpoch: atEpoch ?? this.atEpoch,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (employeeId.present) {
+      map['employee_id'] = Variable<int>(employeeId.value);
+    }
+    if (monthKey.present) {
+      map['month_key'] = Variable<int>(monthKey.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<int>(kind.value);
+    }
+    if (amountCents.present) {
+      map['amount_cents'] = Variable<int>(amountCents.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (atEpoch.present) {
+      map['at_epoch'] = Variable<int>(atEpoch.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PayAdjustmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('monthKey: $monthKey, ')
+          ..write('kind: $kind, ')
+          ..write('amountCents: $amountCents, ')
+          ..write('note: $note, ')
+          ..write('atEpoch: $atEpoch')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PayEditsTable extends PayEdits
+    with TableInfo<$PayEditsTable, PayEditRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PayEditsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _employeeIdMeta = const VerificationMeta(
+    'employeeId',
+  );
+  @override
+  late final GeneratedColumn<int> employeeId = GeneratedColumn<int>(
+    'employee_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _monthKeyMeta = const VerificationMeta(
+    'monthKey',
+  );
+  @override
+  late final GeneratedColumn<int> monthKey = GeneratedColumn<int>(
+    'month_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _overtimeMinutesMeta = const VerificationMeta(
+    'overtimeMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> overtimeMinutes = GeneratedColumn<int>(
+    'overtime_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dayOffMinutesMeta = const VerificationMeta(
+    'dayOffMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> dayOffMinutes = GeneratedColumn<int>(
+    'day_off_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lateMinutesMeta = const VerificationMeta(
+    'lateMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> lateMinutes = GeneratedColumn<int>(
+    'late_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _earlyLeaveMinutesMeta = const VerificationMeta(
+    'earlyLeaveMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> earlyLeaveMinutes = GeneratedColumn<int>(
+    'early_leave_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _absentDaysMeta = const VerificationMeta(
+    'absentDays',
+  );
+  @override
+  late final GeneratedColumn<int> absentDays = GeneratedColumn<int>(
+    'absent_days',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    employeeId,
+    monthKey,
+    overtimeMinutes,
+    dayOffMinutes,
+    lateMinutes,
+    earlyLeaveMinutes,
+    absentDays,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pay_edits';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PayEditRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('employee_id')) {
+      context.handle(
+        _employeeIdMeta,
+        employeeId.isAcceptableOrUnknown(data['employee_id']!, _employeeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_employeeIdMeta);
+    }
+    if (data.containsKey('month_key')) {
+      context.handle(
+        _monthKeyMeta,
+        monthKey.isAcceptableOrUnknown(data['month_key']!, _monthKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_monthKeyMeta);
+    }
+    if (data.containsKey('overtime_minutes')) {
+      context.handle(
+        _overtimeMinutesMeta,
+        overtimeMinutes.isAcceptableOrUnknown(
+          data['overtime_minutes']!,
+          _overtimeMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('day_off_minutes')) {
+      context.handle(
+        _dayOffMinutesMeta,
+        dayOffMinutes.isAcceptableOrUnknown(
+          data['day_off_minutes']!,
+          _dayOffMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('late_minutes')) {
+      context.handle(
+        _lateMinutesMeta,
+        lateMinutes.isAcceptableOrUnknown(
+          data['late_minutes']!,
+          _lateMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('early_leave_minutes')) {
+      context.handle(
+        _earlyLeaveMinutesMeta,
+        earlyLeaveMinutes.isAcceptableOrUnknown(
+          data['early_leave_minutes']!,
+          _earlyLeaveMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('absent_days')) {
+      context.handle(
+        _absentDaysMeta,
+        absentDays.isAcceptableOrUnknown(data['absent_days']!, _absentDaysMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {employeeId, monthKey};
+  @override
+  PayEditRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PayEditRow(
+      employeeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}employee_id'],
+      )!,
+      monthKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}month_key'],
+      )!,
+      overtimeMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}overtime_minutes'],
+      ),
+      dayOffMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}day_off_minutes'],
+      ),
+      lateMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}late_minutes'],
+      ),
+      earlyLeaveMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}early_leave_minutes'],
+      ),
+      absentDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}absent_days'],
+      ),
+    );
+  }
+
+  @override
+  $PayEditsTable createAlias(String alias) {
+    return $PayEditsTable(attachedDatabase, alias);
+  }
+}
+
+class PayEditRow extends DataClass implements Insertable<PayEditRow> {
+  final int employeeId;
+  final int monthKey;
+  final int? overtimeMinutes;
+  final int? dayOffMinutes;
+  final int? lateMinutes;
+  final int? earlyLeaveMinutes;
+  final int? absentDays;
+  const PayEditRow({
+    required this.employeeId,
+    required this.monthKey,
+    this.overtimeMinutes,
+    this.dayOffMinutes,
+    this.lateMinutes,
+    this.earlyLeaveMinutes,
+    this.absentDays,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['employee_id'] = Variable<int>(employeeId);
+    map['month_key'] = Variable<int>(monthKey);
+    if (!nullToAbsent || overtimeMinutes != null) {
+      map['overtime_minutes'] = Variable<int>(overtimeMinutes);
+    }
+    if (!nullToAbsent || dayOffMinutes != null) {
+      map['day_off_minutes'] = Variable<int>(dayOffMinutes);
+    }
+    if (!nullToAbsent || lateMinutes != null) {
+      map['late_minutes'] = Variable<int>(lateMinutes);
+    }
+    if (!nullToAbsent || earlyLeaveMinutes != null) {
+      map['early_leave_minutes'] = Variable<int>(earlyLeaveMinutes);
+    }
+    if (!nullToAbsent || absentDays != null) {
+      map['absent_days'] = Variable<int>(absentDays);
+    }
+    return map;
+  }
+
+  PayEditsCompanion toCompanion(bool nullToAbsent) {
+    return PayEditsCompanion(
+      employeeId: Value(employeeId),
+      monthKey: Value(monthKey),
+      overtimeMinutes: overtimeMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(overtimeMinutes),
+      dayOffMinutes: dayOffMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dayOffMinutes),
+      lateMinutes: lateMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lateMinutes),
+      earlyLeaveMinutes: earlyLeaveMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(earlyLeaveMinutes),
+      absentDays: absentDays == null && nullToAbsent
+          ? const Value.absent()
+          : Value(absentDays),
+    );
+  }
+
+  factory PayEditRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PayEditRow(
+      employeeId: serializer.fromJson<int>(json['employeeId']),
+      monthKey: serializer.fromJson<int>(json['monthKey']),
+      overtimeMinutes: serializer.fromJson<int?>(json['overtimeMinutes']),
+      dayOffMinutes: serializer.fromJson<int?>(json['dayOffMinutes']),
+      lateMinutes: serializer.fromJson<int?>(json['lateMinutes']),
+      earlyLeaveMinutes: serializer.fromJson<int?>(json['earlyLeaveMinutes']),
+      absentDays: serializer.fromJson<int?>(json['absentDays']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'employeeId': serializer.toJson<int>(employeeId),
+      'monthKey': serializer.toJson<int>(monthKey),
+      'overtimeMinutes': serializer.toJson<int?>(overtimeMinutes),
+      'dayOffMinutes': serializer.toJson<int?>(dayOffMinutes),
+      'lateMinutes': serializer.toJson<int?>(lateMinutes),
+      'earlyLeaveMinutes': serializer.toJson<int?>(earlyLeaveMinutes),
+      'absentDays': serializer.toJson<int?>(absentDays),
+    };
+  }
+
+  PayEditRow copyWith({
+    int? employeeId,
+    int? monthKey,
+    Value<int?> overtimeMinutes = const Value.absent(),
+    Value<int?> dayOffMinutes = const Value.absent(),
+    Value<int?> lateMinutes = const Value.absent(),
+    Value<int?> earlyLeaveMinutes = const Value.absent(),
+    Value<int?> absentDays = const Value.absent(),
+  }) => PayEditRow(
+    employeeId: employeeId ?? this.employeeId,
+    monthKey: monthKey ?? this.monthKey,
+    overtimeMinutes: overtimeMinutes.present
+        ? overtimeMinutes.value
+        : this.overtimeMinutes,
+    dayOffMinutes: dayOffMinutes.present
+        ? dayOffMinutes.value
+        : this.dayOffMinutes,
+    lateMinutes: lateMinutes.present ? lateMinutes.value : this.lateMinutes,
+    earlyLeaveMinutes: earlyLeaveMinutes.present
+        ? earlyLeaveMinutes.value
+        : this.earlyLeaveMinutes,
+    absentDays: absentDays.present ? absentDays.value : this.absentDays,
+  );
+  PayEditRow copyWithCompanion(PayEditsCompanion data) {
+    return PayEditRow(
+      employeeId: data.employeeId.present
+          ? data.employeeId.value
+          : this.employeeId,
+      monthKey: data.monthKey.present ? data.monthKey.value : this.monthKey,
+      overtimeMinutes: data.overtimeMinutes.present
+          ? data.overtimeMinutes.value
+          : this.overtimeMinutes,
+      dayOffMinutes: data.dayOffMinutes.present
+          ? data.dayOffMinutes.value
+          : this.dayOffMinutes,
+      lateMinutes: data.lateMinutes.present
+          ? data.lateMinutes.value
+          : this.lateMinutes,
+      earlyLeaveMinutes: data.earlyLeaveMinutes.present
+          ? data.earlyLeaveMinutes.value
+          : this.earlyLeaveMinutes,
+      absentDays: data.absentDays.present
+          ? data.absentDays.value
+          : this.absentDays,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PayEditRow(')
+          ..write('employeeId: $employeeId, ')
+          ..write('monthKey: $monthKey, ')
+          ..write('overtimeMinutes: $overtimeMinutes, ')
+          ..write('dayOffMinutes: $dayOffMinutes, ')
+          ..write('lateMinutes: $lateMinutes, ')
+          ..write('earlyLeaveMinutes: $earlyLeaveMinutes, ')
+          ..write('absentDays: $absentDays')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    employeeId,
+    monthKey,
+    overtimeMinutes,
+    dayOffMinutes,
+    lateMinutes,
+    earlyLeaveMinutes,
+    absentDays,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PayEditRow &&
+          other.employeeId == this.employeeId &&
+          other.monthKey == this.monthKey &&
+          other.overtimeMinutes == this.overtimeMinutes &&
+          other.dayOffMinutes == this.dayOffMinutes &&
+          other.lateMinutes == this.lateMinutes &&
+          other.earlyLeaveMinutes == this.earlyLeaveMinutes &&
+          other.absentDays == this.absentDays);
+}
+
+class PayEditsCompanion extends UpdateCompanion<PayEditRow> {
+  final Value<int> employeeId;
+  final Value<int> monthKey;
+  final Value<int?> overtimeMinutes;
+  final Value<int?> dayOffMinutes;
+  final Value<int?> lateMinutes;
+  final Value<int?> earlyLeaveMinutes;
+  final Value<int?> absentDays;
+  final Value<int> rowid;
+  const PayEditsCompanion({
+    this.employeeId = const Value.absent(),
+    this.monthKey = const Value.absent(),
+    this.overtimeMinutes = const Value.absent(),
+    this.dayOffMinutes = const Value.absent(),
+    this.lateMinutes = const Value.absent(),
+    this.earlyLeaveMinutes = const Value.absent(),
+    this.absentDays = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PayEditsCompanion.insert({
+    required int employeeId,
+    required int monthKey,
+    this.overtimeMinutes = const Value.absent(),
+    this.dayOffMinutes = const Value.absent(),
+    this.lateMinutes = const Value.absent(),
+    this.earlyLeaveMinutes = const Value.absent(),
+    this.absentDays = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : employeeId = Value(employeeId),
+       monthKey = Value(monthKey);
+  static Insertable<PayEditRow> custom({
+    Expression<int>? employeeId,
+    Expression<int>? monthKey,
+    Expression<int>? overtimeMinutes,
+    Expression<int>? dayOffMinutes,
+    Expression<int>? lateMinutes,
+    Expression<int>? earlyLeaveMinutes,
+    Expression<int>? absentDays,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (employeeId != null) 'employee_id': employeeId,
+      if (monthKey != null) 'month_key': monthKey,
+      if (overtimeMinutes != null) 'overtime_minutes': overtimeMinutes,
+      if (dayOffMinutes != null) 'day_off_minutes': dayOffMinutes,
+      if (lateMinutes != null) 'late_minutes': lateMinutes,
+      if (earlyLeaveMinutes != null) 'early_leave_minutes': earlyLeaveMinutes,
+      if (absentDays != null) 'absent_days': absentDays,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PayEditsCompanion copyWith({
+    Value<int>? employeeId,
+    Value<int>? monthKey,
+    Value<int?>? overtimeMinutes,
+    Value<int?>? dayOffMinutes,
+    Value<int?>? lateMinutes,
+    Value<int?>? earlyLeaveMinutes,
+    Value<int?>? absentDays,
+    Value<int>? rowid,
+  }) {
+    return PayEditsCompanion(
+      employeeId: employeeId ?? this.employeeId,
+      monthKey: monthKey ?? this.monthKey,
+      overtimeMinutes: overtimeMinutes ?? this.overtimeMinutes,
+      dayOffMinutes: dayOffMinutes ?? this.dayOffMinutes,
+      lateMinutes: lateMinutes ?? this.lateMinutes,
+      earlyLeaveMinutes: earlyLeaveMinutes ?? this.earlyLeaveMinutes,
+      absentDays: absentDays ?? this.absentDays,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (employeeId.present) {
+      map['employee_id'] = Variable<int>(employeeId.value);
+    }
+    if (monthKey.present) {
+      map['month_key'] = Variable<int>(monthKey.value);
+    }
+    if (overtimeMinutes.present) {
+      map['overtime_minutes'] = Variable<int>(overtimeMinutes.value);
+    }
+    if (dayOffMinutes.present) {
+      map['day_off_minutes'] = Variable<int>(dayOffMinutes.value);
+    }
+    if (lateMinutes.present) {
+      map['late_minutes'] = Variable<int>(lateMinutes.value);
+    }
+    if (earlyLeaveMinutes.present) {
+      map['early_leave_minutes'] = Variable<int>(earlyLeaveMinutes.value);
+    }
+    if (absentDays.present) {
+      map['absent_days'] = Variable<int>(absentDays.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PayEditsCompanion(')
+          ..write('employeeId: $employeeId, ')
+          ..write('monthKey: $monthKey, ')
+          ..write('overtimeMinutes: $overtimeMinutes, ')
+          ..write('dayOffMinutes: $dayOffMinutes, ')
+          ..write('lateMinutes: $lateMinutes, ')
+          ..write('earlyLeaveMinutes: $earlyLeaveMinutes, ')
+          ..write('absentDays: $absentDays, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PayrollRunsTable extends PayrollRuns
+    with TableInfo<$PayrollRunsTable, PayrollRunRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PayrollRunsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _monthKeyMeta = const VerificationMeta(
+    'monthKey',
+  );
+  @override
+  late final GeneratedColumn<int> monthKey = GeneratedColumn<int>(
+    'month_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paidEpochMeta = const VerificationMeta(
+    'paidEpoch',
+  );
+  @override
+  late final GeneratedColumn<int> paidEpoch = GeneratedColumn<int>(
+    'paid_epoch',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _snapshotMeta = const VerificationMeta(
+    'snapshot',
+  );
+  @override
+  late final GeneratedColumn<String> snapshot = GeneratedColumn<String>(
+    'snapshot',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [monthKey, paidEpoch, snapshot];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'payroll_runs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PayrollRunRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('month_key')) {
+      context.handle(
+        _monthKeyMeta,
+        monthKey.isAcceptableOrUnknown(data['month_key']!, _monthKeyMeta),
+      );
+    }
+    if (data.containsKey('paid_epoch')) {
+      context.handle(
+        _paidEpochMeta,
+        paidEpoch.isAcceptableOrUnknown(data['paid_epoch']!, _paidEpochMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_paidEpochMeta);
+    }
+    if (data.containsKey('snapshot')) {
+      context.handle(
+        _snapshotMeta,
+        snapshot.isAcceptableOrUnknown(data['snapshot']!, _snapshotMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_snapshotMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {monthKey};
+  @override
+  PayrollRunRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PayrollRunRow(
+      monthKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}month_key'],
+      )!,
+      paidEpoch: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}paid_epoch'],
+      )!,
+      snapshot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}snapshot'],
+      )!,
+    );
+  }
+
+  @override
+  $PayrollRunsTable createAlias(String alias) {
+    return $PayrollRunsTable(attachedDatabase, alias);
+  }
+}
+
+class PayrollRunRow extends DataClass implements Insertable<PayrollRunRow> {
+  final int monthKey;
+  final int paidEpoch;
+  final String snapshot;
+  const PayrollRunRow({
+    required this.monthKey,
+    required this.paidEpoch,
+    required this.snapshot,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['month_key'] = Variable<int>(monthKey);
+    map['paid_epoch'] = Variable<int>(paidEpoch);
+    map['snapshot'] = Variable<String>(snapshot);
+    return map;
+  }
+
+  PayrollRunsCompanion toCompanion(bool nullToAbsent) {
+    return PayrollRunsCompanion(
+      monthKey: Value(monthKey),
+      paidEpoch: Value(paidEpoch),
+      snapshot: Value(snapshot),
+    );
+  }
+
+  factory PayrollRunRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PayrollRunRow(
+      monthKey: serializer.fromJson<int>(json['monthKey']),
+      paidEpoch: serializer.fromJson<int>(json['paidEpoch']),
+      snapshot: serializer.fromJson<String>(json['snapshot']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'monthKey': serializer.toJson<int>(monthKey),
+      'paidEpoch': serializer.toJson<int>(paidEpoch),
+      'snapshot': serializer.toJson<String>(snapshot),
+    };
+  }
+
+  PayrollRunRow copyWith({int? monthKey, int? paidEpoch, String? snapshot}) =>
+      PayrollRunRow(
+        monthKey: monthKey ?? this.monthKey,
+        paidEpoch: paidEpoch ?? this.paidEpoch,
+        snapshot: snapshot ?? this.snapshot,
+      );
+  PayrollRunRow copyWithCompanion(PayrollRunsCompanion data) {
+    return PayrollRunRow(
+      monthKey: data.monthKey.present ? data.monthKey.value : this.monthKey,
+      paidEpoch: data.paidEpoch.present ? data.paidEpoch.value : this.paidEpoch,
+      snapshot: data.snapshot.present ? data.snapshot.value : this.snapshot,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PayrollRunRow(')
+          ..write('monthKey: $monthKey, ')
+          ..write('paidEpoch: $paidEpoch, ')
+          ..write('snapshot: $snapshot')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(monthKey, paidEpoch, snapshot);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PayrollRunRow &&
+          other.monthKey == this.monthKey &&
+          other.paidEpoch == this.paidEpoch &&
+          other.snapshot == this.snapshot);
+}
+
+class PayrollRunsCompanion extends UpdateCompanion<PayrollRunRow> {
+  final Value<int> monthKey;
+  final Value<int> paidEpoch;
+  final Value<String> snapshot;
+  const PayrollRunsCompanion({
+    this.monthKey = const Value.absent(),
+    this.paidEpoch = const Value.absent(),
+    this.snapshot = const Value.absent(),
+  });
+  PayrollRunsCompanion.insert({
+    this.monthKey = const Value.absent(),
+    required int paidEpoch,
+    required String snapshot,
+  }) : paidEpoch = Value(paidEpoch),
+       snapshot = Value(snapshot);
+  static Insertable<PayrollRunRow> custom({
+    Expression<int>? monthKey,
+    Expression<int>? paidEpoch,
+    Expression<String>? snapshot,
+  }) {
+    return RawValuesInsertable({
+      if (monthKey != null) 'month_key': monthKey,
+      if (paidEpoch != null) 'paid_epoch': paidEpoch,
+      if (snapshot != null) 'snapshot': snapshot,
+    });
+  }
+
+  PayrollRunsCompanion copyWith({
+    Value<int>? monthKey,
+    Value<int>? paidEpoch,
+    Value<String>? snapshot,
+  }) {
+    return PayrollRunsCompanion(
+      monthKey: monthKey ?? this.monthKey,
+      paidEpoch: paidEpoch ?? this.paidEpoch,
+      snapshot: snapshot ?? this.snapshot,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (monthKey.present) {
+      map['month_key'] = Variable<int>(monthKey.value);
+    }
+    if (paidEpoch.present) {
+      map['paid_epoch'] = Variable<int>(paidEpoch.value);
+    }
+    if (snapshot.present) {
+      map['snapshot'] = Variable<String>(snapshot.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PayrollRunsCompanion(')
+          ..write('monthKey: $monthKey, ')
+          ..write('paidEpoch: $paidEpoch, ')
+          ..write('snapshot: $snapshot')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2873,6 +4411,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $EmployeeShiftsTable employeeShifts = $EmployeeShiftsTable(this);
   late final $RosterEntriesTable rosterEntries = $RosterEntriesTable(this);
   late final $MetaTable meta = $MetaTable(this);
+  late final $WagesTable wages = $WagesTable(this);
+  late final $PayAdjustmentsTable payAdjustments = $PayAdjustmentsTable(this);
+  late final $PayEditsTable payEdits = $PayEditsTable(this);
+  late final $PayrollRunsTable payrollRuns = $PayrollRunsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2885,6 +4427,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     employeeShifts,
     rosterEntries,
     meta,
+    wages,
+    payAdjustments,
+    payEdits,
+    payrollRuns,
   ];
 }
 
@@ -4385,6 +5931,829 @@ typedef $$MetaTableProcessedTableManager =
       MetaRow,
       PrefetchHooks Function()
     >;
+typedef $$WagesTableCreateCompanionBuilder =
+    WagesCompanion Function({
+      required int employeeId,
+      required int fromMonth,
+      required int kind,
+      required int amountCents,
+      Value<int> rowid,
+    });
+typedef $$WagesTableUpdateCompanionBuilder =
+    WagesCompanion Function({
+      Value<int> employeeId,
+      Value<int> fromMonth,
+      Value<int> kind,
+      Value<int> amountCents,
+      Value<int> rowid,
+    });
+
+class $$WagesTableFilterComposer extends Composer<_$AppDatabase, $WagesTable> {
+  $$WagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get fromMonth => $composableBuilder(
+    column: $table.fromMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountCents => $composableBuilder(
+    column: $table.amountCents,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $WagesTable> {
+  $$WagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get fromMonth => $composableBuilder(
+    column: $table.fromMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountCents => $composableBuilder(
+    column: $table.amountCents,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WagesTable> {
+  $$WagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get fromMonth =>
+      $composableBuilder(column: $table.fromMonth, builder: (column) => column);
+
+  GeneratedColumn<int> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<int> get amountCents => $composableBuilder(
+    column: $table.amountCents,
+    builder: (column) => column,
+  );
+}
+
+class $$WagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WagesTable,
+          WageRow,
+          $$WagesTableFilterComposer,
+          $$WagesTableOrderingComposer,
+          $$WagesTableAnnotationComposer,
+          $$WagesTableCreateCompanionBuilder,
+          $$WagesTableUpdateCompanionBuilder,
+          (WageRow, BaseReferences<_$AppDatabase, $WagesTable, WageRow>),
+          WageRow,
+          PrefetchHooks Function()
+        > {
+  $$WagesTableTableManager(_$AppDatabase db, $WagesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> employeeId = const Value.absent(),
+                Value<int> fromMonth = const Value.absent(),
+                Value<int> kind = const Value.absent(),
+                Value<int> amountCents = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WagesCompanion(
+                employeeId: employeeId,
+                fromMonth: fromMonth,
+                kind: kind,
+                amountCents: amountCents,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int employeeId,
+                required int fromMonth,
+                required int kind,
+                required int amountCents,
+                Value<int> rowid = const Value.absent(),
+              }) => WagesCompanion.insert(
+                employeeId: employeeId,
+                fromMonth: fromMonth,
+                kind: kind,
+                amountCents: amountCents,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WagesTable,
+      WageRow,
+      $$WagesTableFilterComposer,
+      $$WagesTableOrderingComposer,
+      $$WagesTableAnnotationComposer,
+      $$WagesTableCreateCompanionBuilder,
+      $$WagesTableUpdateCompanionBuilder,
+      (WageRow, BaseReferences<_$AppDatabase, $WagesTable, WageRow>),
+      WageRow,
+      PrefetchHooks Function()
+    >;
+typedef $$PayAdjustmentsTableCreateCompanionBuilder =
+    PayAdjustmentsCompanion Function({
+      Value<int> id,
+      required int employeeId,
+      required int monthKey,
+      required int kind,
+      required int amountCents,
+      Value<String> note,
+      required int atEpoch,
+    });
+typedef $$PayAdjustmentsTableUpdateCompanionBuilder =
+    PayAdjustmentsCompanion Function({
+      Value<int> id,
+      Value<int> employeeId,
+      Value<int> monthKey,
+      Value<int> kind,
+      Value<int> amountCents,
+      Value<String> note,
+      Value<int> atEpoch,
+    });
+
+class $$PayAdjustmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $PayAdjustmentsTable> {
+  $$PayAdjustmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get monthKey => $composableBuilder(
+    column: $table.monthKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountCents => $composableBuilder(
+    column: $table.amountCents,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get atEpoch => $composableBuilder(
+    column: $table.atEpoch,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PayAdjustmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PayAdjustmentsTable> {
+  $$PayAdjustmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get monthKey => $composableBuilder(
+    column: $table.monthKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountCents => $composableBuilder(
+    column: $table.amountCents,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get atEpoch => $composableBuilder(
+    column: $table.atEpoch,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PayAdjustmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PayAdjustmentsTable> {
+  $$PayAdjustmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get monthKey =>
+      $composableBuilder(column: $table.monthKey, builder: (column) => column);
+
+  GeneratedColumn<int> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<int> get amountCents => $composableBuilder(
+    column: $table.amountCents,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<int> get atEpoch =>
+      $composableBuilder(column: $table.atEpoch, builder: (column) => column);
+}
+
+class $$PayAdjustmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PayAdjustmentsTable,
+          PayAdjustmentRow,
+          $$PayAdjustmentsTableFilterComposer,
+          $$PayAdjustmentsTableOrderingComposer,
+          $$PayAdjustmentsTableAnnotationComposer,
+          $$PayAdjustmentsTableCreateCompanionBuilder,
+          $$PayAdjustmentsTableUpdateCompanionBuilder,
+          (
+            PayAdjustmentRow,
+            BaseReferences<
+              _$AppDatabase,
+              $PayAdjustmentsTable,
+              PayAdjustmentRow
+            >,
+          ),
+          PayAdjustmentRow,
+          PrefetchHooks Function()
+        > {
+  $$PayAdjustmentsTableTableManager(
+    _$AppDatabase db,
+    $PayAdjustmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PayAdjustmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PayAdjustmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PayAdjustmentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> employeeId = const Value.absent(),
+                Value<int> monthKey = const Value.absent(),
+                Value<int> kind = const Value.absent(),
+                Value<int> amountCents = const Value.absent(),
+                Value<String> note = const Value.absent(),
+                Value<int> atEpoch = const Value.absent(),
+              }) => PayAdjustmentsCompanion(
+                id: id,
+                employeeId: employeeId,
+                monthKey: monthKey,
+                kind: kind,
+                amountCents: amountCents,
+                note: note,
+                atEpoch: atEpoch,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int employeeId,
+                required int monthKey,
+                required int kind,
+                required int amountCents,
+                Value<String> note = const Value.absent(),
+                required int atEpoch,
+              }) => PayAdjustmentsCompanion.insert(
+                id: id,
+                employeeId: employeeId,
+                monthKey: monthKey,
+                kind: kind,
+                amountCents: amountCents,
+                note: note,
+                atEpoch: atEpoch,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PayAdjustmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PayAdjustmentsTable,
+      PayAdjustmentRow,
+      $$PayAdjustmentsTableFilterComposer,
+      $$PayAdjustmentsTableOrderingComposer,
+      $$PayAdjustmentsTableAnnotationComposer,
+      $$PayAdjustmentsTableCreateCompanionBuilder,
+      $$PayAdjustmentsTableUpdateCompanionBuilder,
+      (
+        PayAdjustmentRow,
+        BaseReferences<_$AppDatabase, $PayAdjustmentsTable, PayAdjustmentRow>,
+      ),
+      PayAdjustmentRow,
+      PrefetchHooks Function()
+    >;
+typedef $$PayEditsTableCreateCompanionBuilder =
+    PayEditsCompanion Function({
+      required int employeeId,
+      required int monthKey,
+      Value<int?> overtimeMinutes,
+      Value<int?> dayOffMinutes,
+      Value<int?> lateMinutes,
+      Value<int?> earlyLeaveMinutes,
+      Value<int?> absentDays,
+      Value<int> rowid,
+    });
+typedef $$PayEditsTableUpdateCompanionBuilder =
+    PayEditsCompanion Function({
+      Value<int> employeeId,
+      Value<int> monthKey,
+      Value<int?> overtimeMinutes,
+      Value<int?> dayOffMinutes,
+      Value<int?> lateMinutes,
+      Value<int?> earlyLeaveMinutes,
+      Value<int?> absentDays,
+      Value<int> rowid,
+    });
+
+class $$PayEditsTableFilterComposer
+    extends Composer<_$AppDatabase, $PayEditsTable> {
+  $$PayEditsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get monthKey => $composableBuilder(
+    column: $table.monthKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get overtimeMinutes => $composableBuilder(
+    column: $table.overtimeMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dayOffMinutes => $composableBuilder(
+    column: $table.dayOffMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lateMinutes => $composableBuilder(
+    column: $table.lateMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get earlyLeaveMinutes => $composableBuilder(
+    column: $table.earlyLeaveMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get absentDays => $composableBuilder(
+    column: $table.absentDays,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PayEditsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PayEditsTable> {
+  $$PayEditsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get monthKey => $composableBuilder(
+    column: $table.monthKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get overtimeMinutes => $composableBuilder(
+    column: $table.overtimeMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dayOffMinutes => $composableBuilder(
+    column: $table.dayOffMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lateMinutes => $composableBuilder(
+    column: $table.lateMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get earlyLeaveMinutes => $composableBuilder(
+    column: $table.earlyLeaveMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get absentDays => $composableBuilder(
+    column: $table.absentDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PayEditsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PayEditsTable> {
+  $$PayEditsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get employeeId => $composableBuilder(
+    column: $table.employeeId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get monthKey =>
+      $composableBuilder(column: $table.monthKey, builder: (column) => column);
+
+  GeneratedColumn<int> get overtimeMinutes => $composableBuilder(
+    column: $table.overtimeMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dayOffMinutes => $composableBuilder(
+    column: $table.dayOffMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lateMinutes => $composableBuilder(
+    column: $table.lateMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get earlyLeaveMinutes => $composableBuilder(
+    column: $table.earlyLeaveMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get absentDays => $composableBuilder(
+    column: $table.absentDays,
+    builder: (column) => column,
+  );
+}
+
+class $$PayEditsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PayEditsTable,
+          PayEditRow,
+          $$PayEditsTableFilterComposer,
+          $$PayEditsTableOrderingComposer,
+          $$PayEditsTableAnnotationComposer,
+          $$PayEditsTableCreateCompanionBuilder,
+          $$PayEditsTableUpdateCompanionBuilder,
+          (
+            PayEditRow,
+            BaseReferences<_$AppDatabase, $PayEditsTable, PayEditRow>,
+          ),
+          PayEditRow,
+          PrefetchHooks Function()
+        > {
+  $$PayEditsTableTableManager(_$AppDatabase db, $PayEditsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PayEditsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PayEditsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PayEditsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> employeeId = const Value.absent(),
+                Value<int> monthKey = const Value.absent(),
+                Value<int?> overtimeMinutes = const Value.absent(),
+                Value<int?> dayOffMinutes = const Value.absent(),
+                Value<int?> lateMinutes = const Value.absent(),
+                Value<int?> earlyLeaveMinutes = const Value.absent(),
+                Value<int?> absentDays = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PayEditsCompanion(
+                employeeId: employeeId,
+                monthKey: monthKey,
+                overtimeMinutes: overtimeMinutes,
+                dayOffMinutes: dayOffMinutes,
+                lateMinutes: lateMinutes,
+                earlyLeaveMinutes: earlyLeaveMinutes,
+                absentDays: absentDays,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int employeeId,
+                required int monthKey,
+                Value<int?> overtimeMinutes = const Value.absent(),
+                Value<int?> dayOffMinutes = const Value.absent(),
+                Value<int?> lateMinutes = const Value.absent(),
+                Value<int?> earlyLeaveMinutes = const Value.absent(),
+                Value<int?> absentDays = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PayEditsCompanion.insert(
+                employeeId: employeeId,
+                monthKey: monthKey,
+                overtimeMinutes: overtimeMinutes,
+                dayOffMinutes: dayOffMinutes,
+                lateMinutes: lateMinutes,
+                earlyLeaveMinutes: earlyLeaveMinutes,
+                absentDays: absentDays,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PayEditsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PayEditsTable,
+      PayEditRow,
+      $$PayEditsTableFilterComposer,
+      $$PayEditsTableOrderingComposer,
+      $$PayEditsTableAnnotationComposer,
+      $$PayEditsTableCreateCompanionBuilder,
+      $$PayEditsTableUpdateCompanionBuilder,
+      (PayEditRow, BaseReferences<_$AppDatabase, $PayEditsTable, PayEditRow>),
+      PayEditRow,
+      PrefetchHooks Function()
+    >;
+typedef $$PayrollRunsTableCreateCompanionBuilder =
+    PayrollRunsCompanion Function({
+      Value<int> monthKey,
+      required int paidEpoch,
+      required String snapshot,
+    });
+typedef $$PayrollRunsTableUpdateCompanionBuilder =
+    PayrollRunsCompanion Function({
+      Value<int> monthKey,
+      Value<int> paidEpoch,
+      Value<String> snapshot,
+    });
+
+class $$PayrollRunsTableFilterComposer
+    extends Composer<_$AppDatabase, $PayrollRunsTable> {
+  $$PayrollRunsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get monthKey => $composableBuilder(
+    column: $table.monthKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get paidEpoch => $composableBuilder(
+    column: $table.paidEpoch,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get snapshot => $composableBuilder(
+    column: $table.snapshot,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PayrollRunsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PayrollRunsTable> {
+  $$PayrollRunsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get monthKey => $composableBuilder(
+    column: $table.monthKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get paidEpoch => $composableBuilder(
+    column: $table.paidEpoch,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get snapshot => $composableBuilder(
+    column: $table.snapshot,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PayrollRunsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PayrollRunsTable> {
+  $$PayrollRunsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get monthKey =>
+      $composableBuilder(column: $table.monthKey, builder: (column) => column);
+
+  GeneratedColumn<int> get paidEpoch =>
+      $composableBuilder(column: $table.paidEpoch, builder: (column) => column);
+
+  GeneratedColumn<String> get snapshot =>
+      $composableBuilder(column: $table.snapshot, builder: (column) => column);
+}
+
+class $$PayrollRunsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PayrollRunsTable,
+          PayrollRunRow,
+          $$PayrollRunsTableFilterComposer,
+          $$PayrollRunsTableOrderingComposer,
+          $$PayrollRunsTableAnnotationComposer,
+          $$PayrollRunsTableCreateCompanionBuilder,
+          $$PayrollRunsTableUpdateCompanionBuilder,
+          (
+            PayrollRunRow,
+            BaseReferences<_$AppDatabase, $PayrollRunsTable, PayrollRunRow>,
+          ),
+          PayrollRunRow,
+          PrefetchHooks Function()
+        > {
+  $$PayrollRunsTableTableManager(_$AppDatabase db, $PayrollRunsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PayrollRunsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PayrollRunsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PayrollRunsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> monthKey = const Value.absent(),
+                Value<int> paidEpoch = const Value.absent(),
+                Value<String> snapshot = const Value.absent(),
+              }) => PayrollRunsCompanion(
+                monthKey: monthKey,
+                paidEpoch: paidEpoch,
+                snapshot: snapshot,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> monthKey = const Value.absent(),
+                required int paidEpoch,
+                required String snapshot,
+              }) => PayrollRunsCompanion.insert(
+                monthKey: monthKey,
+                paidEpoch: paidEpoch,
+                snapshot: snapshot,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PayrollRunsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PayrollRunsTable,
+      PayrollRunRow,
+      $$PayrollRunsTableFilterComposer,
+      $$PayrollRunsTableOrderingComposer,
+      $$PayrollRunsTableAnnotationComposer,
+      $$PayrollRunsTableCreateCompanionBuilder,
+      $$PayrollRunsTableUpdateCompanionBuilder,
+      (
+        PayrollRunRow,
+        BaseReferences<_$AppDatabase, $PayrollRunsTable, PayrollRunRow>,
+      ),
+      PayrollRunRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4402,4 +6771,12 @@ class $AppDatabaseManager {
   $$RosterEntriesTableTableManager get rosterEntries =>
       $$RosterEntriesTableTableManager(_db, _db.rosterEntries);
   $$MetaTableTableManager get meta => $$MetaTableTableManager(_db, _db.meta);
+  $$WagesTableTableManager get wages =>
+      $$WagesTableTableManager(_db, _db.wages);
+  $$PayAdjustmentsTableTableManager get payAdjustments =>
+      $$PayAdjustmentsTableTableManager(_db, _db.payAdjustments);
+  $$PayEditsTableTableManager get payEdits =>
+      $$PayEditsTableTableManager(_db, _db.payEdits);
+  $$PayrollRunsTableTableManager get payrollRuns =>
+      $$PayrollRunsTableTableManager(_db, _db.payrollRuns);
 }

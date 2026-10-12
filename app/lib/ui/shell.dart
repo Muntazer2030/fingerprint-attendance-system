@@ -8,6 +8,8 @@ import 'dashboard_page.dart';
 import 'device_page.dart';
 import 'employees_page.dart';
 import 'events_page.dart';
+import 'lock_page.dart';
+import 'payroll_page.dart';
 import 'settings_page.dart';
 import 'timesheet_page.dart';
 import 'theme.dart';
@@ -63,6 +65,9 @@ class _AppShellState extends State<AppShell> {
     final l = AppLocalizations.of(context)!;
     final settings = AppScope.settingsOf(context);
 
+    // Syncing carries on underneath; only the screens are withheld.
+    if (settings.locked) return const LockPage();
+
     // Nothing works without an address and token. Rather than presenting an
     // empty form, go and find the device -- its address changes on nearly
     // every boot, so typing it in is the wrong default.
@@ -77,6 +82,7 @@ class _AppShellState extends State<AppShell> {
       EmployeesPage(api: api),
       const EventsPage(),
       const TimesheetPage(),
+      const PayrollPage(),
       DevicePage(api: api),
       const SettingsPage(),
     ];
@@ -86,6 +92,7 @@ class _AppShellState extends State<AppShell> {
       (Icons.people_outline, Icons.people, l.navEmployees),
       (Icons.list_alt_outlined, Icons.list_alt, l.navEvents),
       (Icons.table_chart_outlined, Icons.table_chart, l.navTimesheet),
+      (Icons.payments_outlined, Icons.payments, l.navPayroll),
       (Icons.memory_outlined, Icons.memory, l.navDevice),
       (Icons.settings_outlined, Icons.settings, l.navSettings),
     ];
@@ -176,6 +183,13 @@ class _Sidebar extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                if (settings.hasPassword)
+                  IconButton(
+                    tooltip: l.lockApp,
+                    visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.lock_outline, size: 18),
+                    onPressed: settings.lock,
+                  ),
               ],
             ),
           ),

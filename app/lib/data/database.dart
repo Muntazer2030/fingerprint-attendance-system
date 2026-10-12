@@ -136,6 +136,69 @@ class RosterEntries extends Table {
   IntColumn get shiftId => integer().nullable()();
 }
 
+/// An employee's wage from a month onward. A raise is a new row, so months
+/// before it keep the wage they were worked at.
+@DataClassName('WageRow')
+class Wages extends Table {
+  IntColumn get employeeId => integer()();
+
+  /// yyyymm the wage starts.
+  IntColumn get fromMonth => integer()();
+
+  /// 0 = monthly salary, 1 = per day, 2 = per hour.
+  IntColumn get kind => integer()();
+
+  /// Hundredths of the currency unit, so money never passes through a float
+  /// in storage.
+  IntColumn get amountCents => integer()();
+
+  @override
+  Set<Column> get primaryKey => {employeeId, fromMonth};
+}
+
+/// Bonuses, deductions and salary advances entered by the manager.
+@DataClassName('PayAdjustmentRow')
+class PayAdjustments extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get employeeId => integer()();
+  IntColumn get monthKey => integer()();
+
+  /// 0 = bonus, 1 = deduction, 2 = advance.
+  IntColumn get kind => integer()();
+  IntColumn get amountCents => integer()();
+  TextColumn get note => text().withDefault(const Constant(''))();
+  IntColumn get atEpoch => integer()();
+}
+
+/// The manager's replacements for clock figures in one month. Null keeps the
+/// clock's value; the clock's figure itself is never altered.
+@DataClassName('PayEditRow')
+class PayEdits extends Table {
+  IntColumn get employeeId => integer()();
+  IntColumn get monthKey => integer()();
+  IntColumn get overtimeMinutes => integer().nullable()();
+  IntColumn get dayOffMinutes => integer().nullable()();
+  IntColumn get lateMinutes => integer().nullable()();
+  IntColumn get earlyLeaveMinutes => integer().nullable()();
+  IntColumn get absentDays => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {employeeId, monthKey};
+}
+
+/// A month marked paid, with the payslips frozen as JSON. Recomputing a paid
+/// month from current data would let a later punch correction silently change
+/// a salary already handed over.
+@DataClassName('PayrollRunRow')
+class PayrollRuns extends Table {
+  IntColumn get monthKey => integer()();
+  IntColumn get paidEpoch => integer()();
+  TextColumn get snapshot => text()();
+
+  @override
+  Set<Column> get primaryKey => {monthKey};
+}
+
 @DriftDatabase(
   tables: [
     Employees,
@@ -145,6 +208,10 @@ class RosterEntries extends Table {
     EmployeeShifts,
     RosterEntries,
     Meta,
+    Wages,
+    PayAdjustments,
+    PayEdits,
+    PayrollRuns,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -168,7 +235,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -181,6 +248,13 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         await m.addColumn(employees, employees.removed);
         await m.createTable(meta);
+      }
+      // v4: payroll.
+      if (from < 4) {
+        await m.createTable(wages);
+        await m.createTable(payAdjustments);
+        await m.createTable(payEdits);
+        await m.createTable(payrollRuns);
       }
     },
   );
@@ -450,6 +524,42 @@ class AppDatabase extends _$AppDatabase {
 
   Future<int> setRosterEntry(RosterEntriesCompanion row) =>
       into(rosterEntries).insertOnConflictUpdate(row);
+
+  // --- payroll -----------------------------------------------------------
+
+  Future<List<WageRow>> allWages() => select(wages).get();
+
+  Future<void> setWage(WagesCompanion row) =>
+      into(wages).insertOnConflictUpdate(row);
+
+  Future<List<PayAdjustmentRow>> payAdjustmentsFor(int monthKey) =>
+      (select(payAdjustments)
+            ..where((t) => t.monthKey.equals(monthKey))
+            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+          .get();
+
+  Future<int> addPayAdjustment(PayAdjustmentsCompanion row) =>
+      into(payAdjustments).insert(row);
+
+  Future<void> deletePayAdjustment(int id) =>
+      (delete(payAdjustments)..where((t) => t.id.equals(id))).go();
+
+  Future<List<PayEditRow>> payEditsFor(int monthKey) => (select(
+    payEdits,
+  )..where((t) => t.monthKey.equals(monthKey))).get();
+
+  Future<void> setPayEdit(PayEditsCompanion row) =>
+      into(payEdits).insertOnConflictUpdate(row);
+
+  Future<PayrollRunRow?> payrollRun(int monthKey) => (select(
+    payrollRuns,
+  )..where((t) => t.monthKey.equals(monthKey))).getSingleOrNull();
+
+  Future<void> savePayrollRun(PayrollRunsCompanion row) =>
+      into(payrollRuns).insert(row);
+
+  Future<void> deletePayrollRun(int monthKey) =>
+      (delete(payrollRuns)..where((t) => t.monthKey.equals(monthKey))).go();
 
   // --- audit -------------------------------------------------------------
 

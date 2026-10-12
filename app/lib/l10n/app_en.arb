@@ -232,5 +232,117 @@
   "minutesAbbr": "m",
   "ofTotal": "of",
   "lowest": "lowest",
-  "daysAbbr": "d"
+  "daysAbbr": "d",
+  "navPayroll": "Payroll",
+  "payRules": "Pay rules",
+  "payRulesHint": "Day wage = monthly salary ÷ 30. Hourly rate = day wage ÷ the employee's usual shift hours.",
+  "totalNet": "Total net pay",
+  "additionsLabel": "Overtime & bonuses",
+  "cutsLabel": "Cuts & advances",
+  "withoutWage": "Without a wage",
+  "noWageSet": "No wage set",
+  "noWageHint": "{count, plural, =1{1 employee has no wage set and is paid nothing this month.} other{{count} employees have no wage set and are paid nothing this month.}}",
+  "@noWageHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "setWage": "Set wage",
+  "wage": "Wage",
+  "wageMonthly": "Monthly salary",
+  "wageDaily": "Per day",
+  "wageHourly": "Per hour",
+  "amount": "Amount",
+  "invalidAmount": "Enter an amount",
+  "wageFromMonth": "Applies from {month} onward. Earlier months keep the wage they had.",
+  "@wageFromMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "dayRate": "Day wage",
+  "hourRate": "Hourly rate",
+  "basePay": "Base pay",
+  "overtimePay": "Overtime",
+  "dayOffPay": "Work on days off",
+  "lateCut": "Late arrivals",
+  "earlyCut": "Early leave",
+  "absenceCut": "Absences",
+  "bonus": "Bonus",
+  "deduction": "Deduction",
+  "advance": "Advance",
+  "adjustmentsTitle": "Bonuses, deductions and advances",
+  "noAdjustments": "None this month",
+  "note": "Note",
+  "noteRequired": "Enter a note. It is kept in the audit log.",
+  "netPay": "Net pay",
+  "clockFigure": "Clock: {value}",
+  "@clockFigure": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "editedPill": "Edited",
+  "editFigure": "Edit",
+  "useClockFigure": "Use clock figure",
+  "hoursUnit": "hours",
+  "daysUnit": "days",
+  "excuseHint": "Lower the absent days to excuse an absence, e.g. sick leave.",
+  "hourlyNoCuts": "Paid by the hour: time not worked is already unpaid, so lateness and absences are not cut again.",
+  "dailyAbsenceNote": "Paid per day attended. Absent days are unpaid.",
+  "markPaid": "Mark month as paid",
+  "markPaidTitle": "Mark {month} as paid?",
+  "@markPaidTitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "markPaidBody": "The figures will be frozen. Later punch corrections and wage or rule changes will not change what was paid. You can reopen the month if you need to.",
+  "monthNotOver": "This month is not over yet. Figures are so far.",
+  "paidBanner": "Paid on {date}. These figures are frozen.",
+  "@paidBanner": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reopen": "Reopen",
+  "reopenBody": "The month will be recalculated from current data, which may differ from what was paid.",
+  "monthClosed": "This month has been paid. Reopen it to make changes.",
+  "currency": "Currency",
+  "currencyHint": "e.g. EGP",
+  "overtimeRate": "Overtime rate",
+  "dayOffRate": "Day-off rate",
+  "lateRate": "Late minute cut",
+  "earlyRate": "Early leave minute cut",
+  "rateHint": "× the hourly rate. 0 turns it off.",
+  "deductAbsence": "Deduct a day's wage for each absence",
+  "minOvertime": "Ignore daily overtime shorter than",
+  "appPassword": "App password",
+  "appPasswordHint": "Asked for every time the app opens.",
+  "appPasswordOff": "No password. Anyone at this computer can open the app.",
+  "setPassword": "Set password",
+  "changePassword": "Change password",
+  "removePassword": "Remove password",
+  "currentPassword": "Current password",
+  "newPassword": "New password",
+  "confirmPassword": "Repeat the new password",
+  "password": "Password",
+  "enterPassword": "Enter the password to continue",
+  "unlock": "Unlock",
+  "lockApp": "Lock",
+  "wrongPassword": "Wrong password",
+  "passwordTooShort": "Use at least 4 characters",
+  "passwordsDontMatch": "The passwords do not match",
+  "passwordSaved": "Password saved",
+  "passwordRemoved": "Password removed"
 }

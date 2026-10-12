@@ -713,4 +713,260 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get daysAbbr => 'd';
+
+  @override
+  String get navPayroll => 'Payroll';
+
+  @override
+  String get payRules => 'Pay rules';
+
+  @override
+  String get payRulesHint =>
+      'Day wage = monthly salary ÷ 30. Hourly rate = day wage ÷ the employee\'s usual shift hours.';
+
+  @override
+  String get totalNet => 'Total net pay';
+
+  @override
+  String get additionsLabel => 'Overtime & bonuses';
+
+  @override
+  String get cutsLabel => 'Cuts & advances';
+
+  @override
+  String get withoutWage => 'Without a wage';
+
+  @override
+  String get noWageSet => 'No wage set';
+
+  @override
+  String noWageHint(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count employees have no wage set and are paid nothing this month.',
+      one: '1 employee has no wage set and is paid nothing this month.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get setWage => 'Set wage';
+
+  @override
+  String get wage => 'Wage';
+
+  @override
+  String get wageMonthly => 'Monthly salary';
+
+  @override
+  String get wageDaily => 'Per day';
+
+  @override
+  String get wageHourly => 'Per hour';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get invalidAmount => 'Enter an amount';
+
+  @override
+  String wageFromMonth(String month) {
+    return 'Applies from $month onward. Earlier months keep the wage they had.';
+  }
+
+  @override
+  String get dayRate => 'Day wage';
+
+  @override
+  String get hourRate => 'Hourly rate';
+
+  @override
+  String get basePay => 'Base pay';
+
+  @override
+  String get overtimePay => 'Overtime';
+
+  @override
+  String get dayOffPay => 'Work on days off';
+
+  @override
+  String get lateCut => 'Late arrivals';
+
+  @override
+  String get earlyCut => 'Early leave';
+
+  @override
+  String get absenceCut => 'Absences';
+
+  @override
+  String get bonus => 'Bonus';
+
+  @override
+  String get deduction => 'Deduction';
+
+  @override
+  String get advance => 'Advance';
+
+  @override
+  String get adjustmentsTitle => 'Bonuses, deductions and advances';
+
+  @override
+  String get noAdjustments => 'None this month';
+
+  @override
+  String get note => 'Note';
+
+  @override
+  String get noteRequired => 'Enter a note. It is kept in the audit log.';
+
+  @override
+  String get netPay => 'Net pay';
+
+  @override
+  String clockFigure(String value) {
+    return 'Clock: $value';
+  }
+
+  @override
+  String get editedPill => 'Edited';
+
+  @override
+  String get editFigure => 'Edit';
+
+  @override
+  String get useClockFigure => 'Use clock figure';
+
+  @override
+  String get hoursUnit => 'hours';
+
+  @override
+  String get daysUnit => 'days';
+
+  @override
+  String get excuseHint =>
+      'Lower the absent days to excuse an absence, e.g. sick leave.';
+
+  @override
+  String get hourlyNoCuts =>
+      'Paid by the hour: time not worked is already unpaid, so lateness and absences are not cut again.';
+
+  @override
+  String get dailyAbsenceNote =>
+      'Paid per day attended. Absent days are unpaid.';
+
+  @override
+  String get markPaid => 'Mark month as paid';
+
+  @override
+  String markPaidTitle(String month) {
+    return 'Mark $month as paid?';
+  }
+
+  @override
+  String get markPaidBody =>
+      'The figures will be frozen. Later punch corrections and wage or rule changes will not change what was paid. You can reopen the month if you need to.';
+
+  @override
+  String get monthNotOver => 'This month is not over yet. Figures are so far.';
+
+  @override
+  String paidBanner(String date) {
+    return 'Paid on $date. These figures are frozen.';
+  }
+
+  @override
+  String get reopen => 'Reopen';
+
+  @override
+  String get reopenBody =>
+      'The month will be recalculated from current data, which may differ from what was paid.';
+
+  @override
+  String get monthClosed =>
+      'This month has been paid. Reopen it to make changes.';
+
+  @override
+  String get currency => 'Currency';
+
+  @override
+  String get currencyHint => 'e.g. EGP';
+
+  @override
+  String get overtimeRate => 'Overtime rate';
+
+  @override
+  String get dayOffRate => 'Day-off rate';
+
+  @override
+  String get lateRate => 'Late minute cut';
+
+  @override
+  String get earlyRate => 'Early leave minute cut';
+
+  @override
+  String get rateHint => '× the hourly rate. 0 turns it off.';
+
+  @override
+  String get deductAbsence => 'Deduct a day\'s wage for each absence';
+
+  @override
+  String get minOvertime => 'Ignore daily overtime shorter than';
+
+  @override
+  String get appPassword => 'App password';
+
+  @override
+  String get appPasswordHint => 'Asked for every time the app opens.';
+
+  @override
+  String get appPasswordOff =>
+      'No password. Anyone at this computer can open the app.';
+
+  @override
+  String get setPassword => 'Set password';
+
+  @override
+  String get changePassword => 'Change password';
+
+  @override
+  String get removePassword => 'Remove password';
+
+  @override
+  String get currentPassword => 'Current password';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get confirmPassword => 'Repeat the new password';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get enterPassword => 'Enter the password to continue';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String get lockApp => 'Lock';
+
+  @override
+  String get wrongPassword => 'Wrong password';
+
+  @override
+  String get passwordTooShort => 'Use at least 4 characters';
+
+  @override
+  String get passwordsDontMatch => 'The passwords do not match';
+
+  @override
+  String get passwordSaved => 'Password saved';
+
+  @override
+  String get passwordRemoved => 'Password removed';
 }

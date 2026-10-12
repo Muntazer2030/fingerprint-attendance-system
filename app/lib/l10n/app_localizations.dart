@@ -1453,6 +1453,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'d'**
   String get daysAbbr;
+
+  /// No description provided for @navPayroll.
+  ///
+  /// In en, this message translates to:
+  /// **'Payroll'**
+  String get navPayroll;
+
+  /// No description provided for @payRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay rules'**
+  String get payRules;
+
+  /// No description provided for @payRulesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Day wage = monthly salary ÷ 30. Hourly rate = day wage ÷ the employee\'s usual shift hours.'**
+  String get payRulesHint;
+
+  /// No description provided for @totalNet.
+  ///
+  /// In en, this message translates to:
+  /// **'Total net pay'**
+  String get totalNet;
+
+  /// No description provided for @additionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Overtime & bonuses'**
+  String get additionsLabel;
+
+  /// No description provided for @cutsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cuts & advances'**
+  String get cutsLabel;
+
+  /// No description provided for @withoutWage.
+  ///
+  /// In en, this message translates to:
+  /// **'Without a wage'**
+  String get withoutWage;
+
+  /// No description provided for @noWageSet.
+  ///
+  /// In en, this message translates to:
+  /// **'No wage set'**
+  String get noWageSet;
+
+  /// No description provided for @noWageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 employee has no wage set and is paid nothing this month.} other{{count} employees have no wage set and are paid nothing this month.}}'**
+  String noWageHint(int count);
+
+  /// No description provided for @setWage.
+  ///
+  /// In en, this message translates to:
+  /// **'Set wage'**
+  String get setWage;
+
+  /// No description provided for @wage.
+  ///
+  /// In en, this message translates to:
+  /// **'Wage'**
+  String get wage;
+
+  /// No description provided for @wageMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly salary'**
+  String get wageMonthly;
+
+  /// No description provided for @wageDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Per day'**
+  String get wageDaily;
+
+  /// No description provided for @wageHourly.
+  ///
+  /// In en, this message translates to:
+  /// **'Per hour'**
+  String get wageHourly;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @invalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount'**
+  String get invalidAmount;
+
+  /// No description provided for @wageFromMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies from {month} onward. Earlier months keep the wage they had.'**
+  String wageFromMonth(String month);
+
+  /// No description provided for @dayRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Day wage'**
+  String get dayRate;
+
+  /// No description provided for @hourRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hourly rate'**
+  String get hourRate;
+
+  /// No description provided for @basePay.
+  ///
+  /// In en, this message translates to:
+  /// **'Base pay'**
+  String get basePay;
+
+  /// No description provided for @overtimePay.
+  ///
+  /// In en, this message translates to:
+  /// **'Overtime'**
+  String get overtimePay;
+
+  /// No description provided for @dayOffPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Work on days off'**
+  String get dayOffPay;
+
+  /// No description provided for @lateCut.
+  ///
+  /// In en, this message translates to:
+  /// **'Late arrivals'**
+  String get lateCut;
+
+  /// No description provided for @earlyCut.
+  ///
+  /// In en, this message translates to:
+  /// **'Early leave'**
+  String get earlyCut;
+
+  /// No description provided for @absenceCut.
+  ///
+  /// In en, this message translates to:
+  /// **'Absences'**
+  String get absenceCut;
+
+  /// No description provided for @bonus.
+  ///
+  /// In en, this message translates to:
+  /// **'Bonus'**
+  String get bonus;
+
+  /// No description provided for @deduction.
+  ///
+  /// In en, this message translates to:
+  /// **'Deduction'**
+  String get deduction;
+
+  /// No description provided for @advance.
+  ///
+  /// In en, this message translates to:
+  /// **'Advance'**
+  String get advance;
+
+  /// No description provided for @adjustmentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bonuses, deductions and advances'**
+  String get adjustmentsTitle;
+
+  /// No description provided for @noAdjustments.
+  ///
+  /// In en, this message translates to:
+  /// **'None this month'**
+  String get noAdjustments;
+
+  /// No description provided for @note.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get note;
+
+  /// No description provided for @noteRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a note. It is kept in the audit log.'**
+  String get noteRequired;
+
+  /// No description provided for @netPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Net pay'**
+  String get netPay;
+
+  /// No description provided for @clockFigure.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock: {value}'**
+  String clockFigure(String value);
+
+  /// No description provided for @editedPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Edited'**
+  String get editedPill;
+
+  /// No description provided for @editFigure.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editFigure;
+
+  /// No description provided for @useClockFigure.
+  ///
+  /// In en, this message translates to:
+  /// **'Use clock figure'**
+  String get useClockFigure;
+
+  /// No description provided for @hoursUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get hoursUnit;
+
+  /// No description provided for @daysUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get daysUnit;
+
+  /// No description provided for @excuseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Lower the absent days to excuse an absence, e.g. sick leave.'**
+  String get excuseHint;
+
+  /// No description provided for @hourlyNoCuts.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid by the hour: time not worked is already unpaid, so lateness and absences are not cut again.'**
+  String get hourlyNoCuts;
+
+  /// No description provided for @dailyAbsenceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid per day attended. Absent days are unpaid.'**
+  String get dailyAbsenceNote;
+
+  /// No description provided for @markPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark month as paid'**
+  String get markPaid;
+
+  /// No description provided for @markPaidTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {month} as paid?'**
+  String markPaidTitle(String month);
+
+  /// No description provided for @markPaidBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The figures will be frozen. Later punch corrections and wage or rule changes will not change what was paid. You can reopen the month if you need to.'**
+  String get markPaidBody;
+
+  /// No description provided for @monthNotOver.
+  ///
+  /// In en, this message translates to:
+  /// **'This month is not over yet. Figures are so far.'**
+  String get monthNotOver;
+
+  /// No description provided for @paidBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid on {date}. These figures are frozen.'**
+  String paidBanner(String date);
+
+  /// No description provided for @reopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen'**
+  String get reopen;
+
+  /// No description provided for @reopenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The month will be recalculated from current data, which may differ from what was paid.'**
+  String get reopenBody;
+
+  /// No description provided for @monthClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This month has been paid. Reopen it to make changes.'**
+  String get monthClosed;
+
+  /// No description provided for @currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currency;
+
+  /// No description provided for @currencyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. EGP'**
+  String get currencyHint;
+
+  /// No description provided for @overtimeRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Overtime rate'**
+  String get overtimeRate;
+
+  /// No description provided for @dayOffRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Day-off rate'**
+  String get dayOffRate;
+
+  /// No description provided for @lateRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Late minute cut'**
+  String get lateRate;
+
+  /// No description provided for @earlyRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Early leave minute cut'**
+  String get earlyRate;
+
+  /// No description provided for @rateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'× the hourly rate. 0 turns it off.'**
+  String get rateHint;
+
+  /// No description provided for @deductAbsence.
+  ///
+  /// In en, this message translates to:
+  /// **'Deduct a day\'s wage for each absence'**
+  String get deductAbsence;
+
+  /// No description provided for @minOvertime.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore daily overtime shorter than'**
+  String get minOvertime;
+
+  /// No description provided for @appPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'App password'**
+  String get appPassword;
+
+  /// No description provided for @appPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Asked for every time the app opens.'**
+  String get appPasswordHint;
+
+  /// No description provided for @appPasswordOff.
+  ///
+  /// In en, this message translates to:
+  /// **'No password. Anyone at this computer can open the app.'**
+  String get appPasswordOff;
+
+  /// No description provided for @setPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Set password'**
+  String get setPassword;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get changePassword;
+
+  /// No description provided for @removePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove password'**
+  String get removePassword;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get currentPassword;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat the new password'**
+  String get confirmPassword;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the password to continue'**
+  String get enterPassword;
+
+  /// No description provided for @unlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlock;
+
+  /// No description provided for @lockApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock'**
+  String get lockApp;
+
+  /// No description provided for @wrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong password'**
+  String get wrongPassword;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Use at least 4 characters'**
+  String get passwordTooShort;
+
+  /// No description provided for @passwordsDontMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The passwords do not match'**
+  String get passwordsDontMatch;
+
+  /// No description provided for @passwordSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Password saved'**
+  String get passwordSaved;
+
+  /// No description provided for @passwordRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Password removed'**
+  String get passwordRemoved;
 }
 
 class _AppLocalizationsDelegate

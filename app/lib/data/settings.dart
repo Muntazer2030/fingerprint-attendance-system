@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,8 +16,10 @@ class Settings extends ChangeNotifier {
   static const _kLocale = 'locale';
   static const _kSyncSeq = 'synced_through_seq';
   static const _kTheme = 'theme_mode';
+  static const _kCurrency = 'currency';
 
   String _host = '';
+  String _currency = '';
   String _token = '';
   Locale _locale = const Locale('en');
   ThemeMode _themeMode = ThemeMode.system;
@@ -26,6 +32,9 @@ class Settings extends ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   int get syncedThroughSeq => _syncedThroughSeq;
   bool get loaded => _loaded;
+
+  /// Label shown after amounts, e.g. "EGP". Only a label: no conversion.
+  String get currency => _currency;
   bool get isConfigured => _host.isNotEmpty && _token.isNotEmpty;
 
   Future<void> load() async {
@@ -40,6 +49,9 @@ class Settings extends ChangeNotifier {
       _ => ThemeMode.system,
     };
     _syncedThroughSeq = p.getInt(_kSyncSeq) ?? 0;
+    _currency = p.getString(_kCurrency) ?? '';
+    _passwordHash = p.getString(_kPassword) ?? '';
+    _locked = hasPassword;
     _loaded = true;
     notifyListeners();
   }
@@ -111,6 +123,85 @@ class Settings extends ChangeNotifier {
     _host = h;
     final p = await SharedPreferences.getInstance();
     await p.setString(_kHost, h);
+    notifyListeners();
+  }
+
+  // --- app password ----------------------------------------------------------
+
+  static const _kPassword = 'app_password';
+  String _passwordHash = '';
+  bool _locked = false;
+
+  /// Keeps casual hands off the payroll, nothing more: the hash sits in the
+  /// same preferences file as everything else, and deleting that entry
+  /// removes the password. Salted and iterated so the file does not reveal it.
+  bool get hasPassword => _passwordHash.isNotEmpty;
+
+  /// True from launch until the password is entered, and after [lock].
+  bool get locked => _locked;
+
+  static const _iterations = 10000;
+
+  /// `sha256:<iterations>:<salt hex>:<hash hex>`.
+  static String hashPassword(String password, {List<int>? salt}) {
+    final s =
+        salt ?? List<int>.generate(16, (_) => Random.secure().nextInt(256));
+    List<int> digest = utf8.encode(password);
+    for (var i = 0; i < _iterations; i++) {
+      digest = sha256.convert([...s, ...digest]).bytes;
+    }
+    String hex(List<int> b) =>
+        b.map((x) => x.toRadixString(16).padLeft(2, '0')).join();
+    return 'sha256:$_iterations:${hex(s)}:${hex(digest)}';
+  }
+
+  static bool verifyPassword(String password, String stored) {
+    final parts = stored.split(':');
+    if (parts.length != 4 || parts[0] != 'sha256') return false;
+    final salt = [
+      for (var i = 0; i < parts[2].length; i += 2)
+        int.parse(parts[2].substring(i, i + 2), radix: 16),
+    ];
+    return hashPassword(password, salt: salt) == stored;
+  }
+
+  bool checkPassword(String password) =>
+      hasPassword && verifyPassword(password, _passwordHash);
+
+  bool unlock(String password) {
+    if (!checkPassword(password)) return false;
+    _locked = false;
+    notifyListeners();
+    return true;
+  }
+
+  void lock() {
+    if (!hasPassword || _locked) return;
+    _locked = true;
+    notifyListeners();
+  }
+
+  /// Sets or replaces the password. Checking the old one is the caller's job,
+  /// so the settings page can ask for it in the same dialog.
+  Future<void> setPassword(String password) async {
+    _passwordHash = hashPassword(password);
+    final p = await SharedPreferences.getInstance();
+    await p.setString(_kPassword, _passwordHash);
+    notifyListeners();
+  }
+
+  Future<void> removePassword() async {
+    _passwordHash = '';
+    _locked = false;
+    final p = await SharedPreferences.getInstance();
+    await p.remove(_kPassword);
+    notifyListeners();
+  }
+
+  Future<void> setCurrency(String c) async {
+    _currency = c.trim();
+    final p = await SharedPreferences.getInstance();
+    await p.setString(_kCurrency, _currency);
     notifyListeners();
   }
 

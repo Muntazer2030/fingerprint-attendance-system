@@ -165,6 +165,34 @@ the component README records both edits.
 100 Mbps, it needs none of these workarounds, and it drops into the same
 wiring. This patch makes the fitted part usable; it does not make it good.
 
+## D13 — Payroll policy
+Agreed with owner 2026-10-11. Pay is computed on the PC from the timesheet
+(D1); the device knows nothing about money.
+
+- **Day wage = monthly salary ÷ 30**, whatever the month's length. Hourly rate
+  = day wage ÷ the employee's usual shift length (the most common scheduled
+  day in the month, else 8 h). Daily and hourly wages are also supported.
+- **Late and early leave are cut per minute** at the hourly rate × a
+  multiplier (default 1×, 0 turns it off). The shift's grace period still
+  decides whether a day is late at all. Hourly staff are never cut — unworked
+  time is already unpaid.
+- **Absence** costs monthly staff one day wage, capped at the salary. A
+  finished month with zero attendance costs the full salary (otherwise ÷30
+  would still pay the weekends).
+- **Overtime** on a scheduled day pays × 1.5, any work on a day off × 2 (both
+  configurable), with an optional per-day minimum below which it is ignored.
+- **Manager edits** replace clock figures (overtime, day-off hours, late,
+  early, absent days) per employee per month; the clock figure is kept beside
+  the edit. Bonuses, deductions and advances are separate entries with a note.
+  All of it is audited.
+- **Marking a month paid freezes it** as a JSON snapshot in `PayrollRuns`.
+  Later punch corrections, wage or rule changes cannot alter a paid month.
+  Reopening deletes the snapshot and recomputes live.
+- Wages are effective-dated by month (`Wages.fromMonth`), so a raise never
+  rewrites earlier months.
+- Known limit: there is no hire date, so a new joiner's days before they
+  started read as absences. Lower their absent days for that month.
+
 ## Open
 - **O3** Exact LCD controller + interface; FPM12 baud, capacity, logic level.
 - **O4** ESP-IDF version: only v6.1-beta1 is provisioned on this machine.

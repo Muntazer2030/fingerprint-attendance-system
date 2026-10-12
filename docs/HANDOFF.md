@@ -41,6 +41,8 @@ tests, a full end-to-end run of the real Windows build against
 | Shift rules + timesheet (+ upcoming / at-work days) | works |
 | .xlsx export (Arabic RTL) | works, verified E2E |
 | Arabic/English + RTL, dark mode | works, screenshots checked |
+| App password (lock on open, lock button, set/change/remove in Settings) | works; tested, checked in the web build (2026-10-12) |
+| Payroll: wages, overtime pay, late/absence cuts, bonuses/advances, mark paid (frozen), .xlsx | works; unit + widget tested, checked in the web build (2026-10-11). Policy in decisions.md D13 |
 
 ### Fixed on 2026-09-30 (keep these fixed)
 
@@ -152,6 +154,21 @@ tools/              api.ps1, screenshot.py, simulate_screen.py
 - **`max_uri_handlers` must exceed the route count.** Sizing it exactly dropped
   the wildcard OPTIONS handler, so every browser request 405'd and the whole app
   broke. Registration failures are now logged.
+- **App password is a lock, not encryption.** Settings stores a salted,
+  iterated SHA-256 (`app_password` in shared preferences); the database itself
+  is not encrypted. Forgotten password: close the app and delete the
+  `flutter.app_password` entry from
+  `%APPDATA%\com.store\attendance_admin\shared_preferences.json` (keep the
+  rest; it holds the device address and token). Dialogs must receive Settings
+  through their constructor: they sit above `AppScope` on the navigator, and a
+  lookup there returned null and crashed Save once.
+- **A paid month is a snapshot, not a calculation.** `PayrollRepository.load`
+  returns the frozen JSON for any month in `PayrollRuns`; changing
+  `Payroll.compute` does not change months already paid, by design. Edits to a
+  paid month throw `MonthClosedException`.
+- **Amounts in the payroll UI are wrapped in LTR isolates** (`_Money`) with a
+  no-break space before the currency. Without the isolate Arabic reorders
+  "−400.00 EGP"; without the no-break space the label wraps.
 - **Commit before ack.** `sync_service` stores punches locally *then* acks.
   Reversing that loses attendance on a crash.
 - **`draw_str` blits a 128Ã—16 bitmap when uploaded, else ASCII.** Do not invert a

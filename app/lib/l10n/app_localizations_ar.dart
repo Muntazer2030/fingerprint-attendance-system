@@ -712,4 +712,260 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get daysAbbr => 'ي';
+
+  @override
+  String get navPayroll => 'الرواتب';
+
+  @override
+  String get payRules => 'قواعد الرواتب';
+
+  @override
+  String get payRulesHint =>
+      'أجر اليوم = الراتب الشهري ÷ 30. أجر الساعة = أجر اليوم ÷ ساعات وردية الموظف المعتادة.';
+
+  @override
+  String get totalNet => 'إجمالي صافي الرواتب';
+
+  @override
+  String get additionsLabel => 'الإضافي والمكافآت';
+
+  @override
+  String get cutsLabel => 'الخصومات والسلف';
+
+  @override
+  String get withoutWage => 'بدون أجر';
+
+  @override
+  String get noWageSet => 'لم يحدد الأجر';
+
+  @override
+  String noWageHint(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count موظفاً بدون أجر محدد ولن يُصرف لهم شيء هذا الشهر.',
+      few: '$count موظفين بدون أجر محدد ولن يُصرف لهم شيء هذا الشهر.',
+      two: 'موظفان بدون أجر محدد ولن يُصرف لهما شيء هذا الشهر.',
+      one: 'موظف واحد بدون أجر محدد ولن يُصرف له شيء هذا الشهر.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get setWage => 'تحديد الأجر';
+
+  @override
+  String get wage => 'الأجر';
+
+  @override
+  String get wageMonthly => 'راتب شهري';
+
+  @override
+  String get wageDaily => 'يومي';
+
+  @override
+  String get wageHourly => 'بالساعة';
+
+  @override
+  String get amount => 'المبلغ';
+
+  @override
+  String get invalidAmount => 'أدخل مبلغاً';
+
+  @override
+  String wageFromMonth(String month) {
+    return 'يُطبق من $month فصاعداً. الأشهر السابقة تحتفظ بأجرها.';
+  }
+
+  @override
+  String get dayRate => 'أجر اليوم';
+
+  @override
+  String get hourRate => 'أجر الساعة';
+
+  @override
+  String get basePay => 'الأجر الأساسي';
+
+  @override
+  String get overtimePay => 'العمل الإضافي';
+
+  @override
+  String get dayOffPay => 'العمل في أيام الراحة';
+
+  @override
+  String get lateCut => 'التأخير';
+
+  @override
+  String get earlyCut => 'الخروج المبكر';
+
+  @override
+  String get absenceCut => 'الغياب';
+
+  @override
+  String get bonus => 'مكافأة';
+
+  @override
+  String get deduction => 'خصم';
+
+  @override
+  String get advance => 'سلفة';
+
+  @override
+  String get adjustmentsTitle => 'المكافآت والخصومات والسلف';
+
+  @override
+  String get noAdjustments => 'لا يوجد هذا الشهر';
+
+  @override
+  String get note => 'ملاحظة';
+
+  @override
+  String get noteRequired => 'أدخل ملاحظة. تُحفظ في سجل التعديلات.';
+
+  @override
+  String get netPay => 'صافي الراتب';
+
+  @override
+  String clockFigure(String value) {
+    return 'حسب الجهاز: $value';
+  }
+
+  @override
+  String get editedPill => 'معدّل';
+
+  @override
+  String get editFigure => 'تعديل';
+
+  @override
+  String get useClockFigure => 'استخدام رقم الجهاز';
+
+  @override
+  String get hoursUnit => 'ساعات';
+
+  @override
+  String get daysUnit => 'أيام';
+
+  @override
+  String get excuseHint =>
+      'قلّل أيام الغياب لاعتبار غياب بعذر، مثل الإجازة المرضية.';
+
+  @override
+  String get hourlyNoCuts =>
+      'أجر بالساعة: الوقت غير المعمول غير مدفوع أصلاً، فلا يُخصم التأخير والغياب مرة أخرى.';
+
+  @override
+  String get dailyAbsenceNote =>
+      'يُدفع عن كل يوم حضور. أيام الغياب غير مدفوعة.';
+
+  @override
+  String get markPaid => 'اعتماد صرف الشهر';
+
+  @override
+  String markPaidTitle(String month) {
+    return 'اعتماد صرف $month؟';
+  }
+
+  @override
+  String get markPaidBody =>
+      'سيتم تثبيت الأرقام. تصحيحات التسجيلات أو تغيير الأجور والقواعد لاحقاً لن تغيّر ما صُرف. يمكنك إعادة فتح الشهر عند الحاجة.';
+
+  @override
+  String get monthNotOver => 'الشهر لم ينتهِ بعد. الأرقام حتى الآن.';
+
+  @override
+  String paidBanner(String date) {
+    return 'تم الصرف في $date. هذه الأرقام مثبّتة.';
+  }
+
+  @override
+  String get reopen => 'إعادة فتح';
+
+  @override
+  String get reopenBody =>
+      'سيُعاد حساب الشهر من البيانات الحالية، وقد يختلف عما صُرف.';
+
+  @override
+  String get monthClosed => 'تم صرف هذا الشهر. أعد فتحه لإجراء تغييرات.';
+
+  @override
+  String get currency => 'العملة';
+
+  @override
+  String get currencyHint => 'مثال: ج.م';
+
+  @override
+  String get overtimeRate => 'معدل الإضافي';
+
+  @override
+  String get dayOffRate => 'معدل يوم الراحة';
+
+  @override
+  String get lateRate => 'خصم دقيقة التأخير';
+
+  @override
+  String get earlyRate => 'خصم دقيقة الخروج المبكر';
+
+  @override
+  String get rateHint => '× أجر الساعة. صفر لإيقافه.';
+
+  @override
+  String get deductAbsence => 'خصم أجر يوم عن كل غياب';
+
+  @override
+  String get minOvertime => 'تجاهل الإضافي اليومي الأقل من';
+
+  @override
+  String get appPassword => 'كلمة مرور التطبيق';
+
+  @override
+  String get appPasswordHint => 'تُطلب في كل مرة يُفتح فيها التطبيق.';
+
+  @override
+  String get appPasswordOff =>
+      'لا توجد كلمة مرور. يمكن لأي شخص على هذا الكمبيوتر فتح التطبيق.';
+
+  @override
+  String get setPassword => 'تعيين كلمة المرور';
+
+  @override
+  String get changePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get removePassword => 'إزالة كلمة المرور';
+
+  @override
+  String get currentPassword => 'كلمة المرور الحالية';
+
+  @override
+  String get newPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get confirmPassword => 'أعد كتابة كلمة المرور الجديدة';
+
+  @override
+  String get password => 'كلمة المرور';
+
+  @override
+  String get enterPassword => 'أدخل كلمة المرور للمتابعة';
+
+  @override
+  String get unlock => 'فتح';
+
+  @override
+  String get lockApp => 'قفل';
+
+  @override
+  String get wrongPassword => 'كلمة المرور غير صحيحة';
+
+  @override
+  String get passwordTooShort => 'استخدم 4 أحرف على الأقل';
+
+  @override
+  String get passwordsDontMatch => 'كلمتا المرور غير متطابقتين';
+
+  @override
+  String get passwordSaved => 'تم حفظ كلمة المرور';
+
+  @override
+  String get passwordRemoved => 'تمت إزالة كلمة المرور';
 }
