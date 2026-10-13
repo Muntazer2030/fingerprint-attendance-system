@@ -17,8 +17,8 @@
 #include "oled.h"
 #include "timesync.h"
 #include "cfg.h"
-#include "net_eth.h"
-#include "evlog.h"
+#include "net_wifi.h"
+#include "notify.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "driver/gpio.h"
@@ -176,7 +176,7 @@ static void date_line(char *out, size_t n)
  * glance and it does not swallow a whole row of the panel. */
 static void draw_net_icon(int x, int y)
 {
-    if (net_eth_got_ip()) {
+    if (net_any_got_ip()) {
         oled_fill_rect(x,     y + 4, 2, 3, true);
         oled_fill_rect(x + 3, y + 2, 2, 5, true);
         oled_fill_rect(x + 6, y,     2, 7, true);
@@ -247,9 +247,9 @@ static void draw_idle(void)
          * support call, and reading it off the screen beats fetching a laptop
          * and a USB cable. Only shown once DHCP has actually answered -- the
          * glyph already says when it has not. */
-        if (net_eth_got_ip()) {
+        if (net_any_got_ip()) {
             /* Centred against the 7 px glyph: the small face is 5 tall. */
-            oled_text_small(12, 1, net_eth_ip());
+            oled_text_small(12, 1, net_active_ip());
         }
 
         if (st.pending > 0) {
@@ -566,6 +566,8 @@ static void scan_step(void)
         return;
     }
     users_record_punch(emp, out ? 1 : 0, now);
+    /* Only queued here; the notifier task does the network work. */
+    notify_punch(emp, out, now, rec.seq, !timesync_is_authoritative());
 
     ESP_LOGI(TAG, "punch seq=%" PRIu32 " emp=%u slot=%u score=%u %s%s",
              rec.seq, emp, slot, score, out ? "OUT" : "IN",

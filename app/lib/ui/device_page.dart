@@ -6,7 +6,9 @@ import '../data/models.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
 import 'shell.dart';
+import 'telegram_page.dart';
 import 'theme.dart';
+import 'wifi_page.dart';
 
 /// Full control of the terminal from the app. Everything here is stored on the
 /// device in NVS and survives a reflash, so the operator never needs the
@@ -365,6 +367,38 @@ class _DevicePageState extends State<DevicePage> {
                         display: _secondsLabel(l, c.dupWindowSeconds),
                         onChanged: (v) => _edit(
                           (d) => d.copyWith(dupWindowSeconds: v.round()),
+                        ),
+                      ),
+
+                      // --- wifi fallback ---
+                      _section(context, l.wifiTitle),
+                      Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.wifi),
+                          title: Text(l.wifiTitle),
+                          subtitle: Text(l.wifiTileHelp),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => WifiPage(api: widget.api),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // --- telegram ---
+                      _section(context, l.tgTitle),
+                      Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.send_outlined),
+                          title: Text(l.tgTitle),
+                          subtitle: Text(l.tgTileHelp),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => TelegramPage(api: widget.api),
+                            ),
+                          ),
                         ),
                       ),
 

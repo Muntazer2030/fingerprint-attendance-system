@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
+import '../domain/roster_push.dart';
+import '../domain/timesheet.dart';
 import 'api_client.dart';
 import 'database.dart';
 import 'device_scanner.dart';
@@ -111,6 +113,7 @@ class SyncService extends ChangeNotifier {
       _lastPulled = await _pullEvents(api);
       _lastSync = DateTime.now();
       if (_lastPulled > 0) _revision++;
+      await _pushRoster(api);
     } finally {
       // Only close clients this service created for itself.
       if (!identical(api, _given)) api.close();
@@ -118,6 +121,75 @@ class SyncService extends ChangeNotifier {
   }
 
   ApiClient? _given;
+
+  int? _rosterConfirmed;
+  DateTime? _rosterCheckedAt;
+  Object? _rosterError;
+
+  /// Why the last roster push failed, if it did. Kept apart from [lastError]:
+  /// attendance syncing is fine even when this is not.
+  Object? get rosterError => _rosterError;
+
+  /// Keeps the terminal's copy of names and upcoming shifts current, so it can
+  /// send Telegram alerts with this PC switched off.
+  ///
+  /// Asks the terminal what it holds only when ours changed, or every ten
+  /// minutes in case it was reset -- not on every 20-second round. Never fails
+  /// the sync: a terminal with older firmware simply has no /roster.
+  Future<void> pushRosterNow(ApiClient api) => _pushRoster(api, force: true);
+
+  Future<void> _pushRoster(ApiClient api, {bool force = false}) async {
+    try {
+      final payload = await buildRoster(DateTime.now());
+      final stale =
+          _rosterCheckedAt == null ||
+          DateTime.now().difference(_rosterCheckedAt!) >
+              const Duration(minutes: 10);
+      if (!force && payload.version == _rosterConfirmed && !stale) return;
+
+      final status = await api.notifyStatus();
+      if (force || status.rosterVersion != payload.version) {
+        await api.pushRoster(
+          version: payload.version,
+          names: payload.names,
+          days: payload.days,
+          tzOffsetMin: payload.tzOffsetMin,
+        );
+      }
+      _rosterConfirmed = payload.version;
+      _rosterCheckedAt = DateTime.now();
+      _rosterError = null;
+    } on ApiException catch (e) {
+      // 404: firmware from before Telegram support. Not an error worth showing.
+      _rosterError = e.statusCode == 404 ? null : e;
+      _rosterCheckedAt = DateTime.now();
+    } catch (e) {
+      _rosterError = e;
+    }
+  }
+
+  /// Everyone currently on the terminal, with their schedule from [from].
+  Future<RosterPayload> buildRoster(DateTime from) async {
+    final employees = [
+      for (final e in await db.allEmployees())
+        if (!e.removed && e.active)
+          RosterEmployee(e.id, e.name.isEmpty ? '#${e.id}' : e.name),
+    ];
+    final to = DateTime(
+      from.year,
+      from.month,
+      from.day + RosterPayload.defaultDays,
+    );
+    final repo = TimesheetRepository(db);
+    await repo.ensureDefaultShift();
+    final resolver = await repo.loadResolver(from: from, to: to);
+    return RosterPayload.build(
+      employees: employees,
+      resolver: resolver,
+      from: from,
+      tzOffsetMin: from.timeZoneOffset.inMinutes,
+    );
+  }
 
   /// Finds the terminal again and adopts its new address.
   ///

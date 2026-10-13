@@ -119,6 +119,45 @@ already shaped and RTL-ordered by the Flutter app.
 State machine: `waiting_finger` -> `lift_finger` -> `waiting_finger_again`
 -> `merging` -> `stored{slot}` | `failed{reason}`.
 
+### Telegram notifications (firmware/main/notify.c, decision D14)
+| method | path | purpose |
+|---|---|---|
+| GET  | `/api/v1/notify` | settings, delivery counters, last error, roster summary |
+| POST | `/api/v1/notify` | partial update: `enabled`, `each_punch`, `late`, `summary_minute` (-1 = off), `chat_id`, `bot_token` (`""` clears) |
+| POST | `/api/v1/notify/test` | no body; queues a test message |
+| POST | `/api/v1/notify/summary` | no body; queues today's summary now |
+| POST | `/api/v1/roster` | `{ version, names_b64, days_b64, tz_offset_min }`, body up to 20 KB |
+
+The bot token is write-only: GET returns `has_bot_token` and the last four
+characters (`bot_token_hint`), never the token. Sending is asynchronous, so
+GET again a few seconds after `/notify/test` to see `sent` or `last_error`.
+
+The roster is binary (little-endian), base64 in the JSON:
+- `names`: repeated `{ u16 id, u8 len, len bytes UTF-8 }` (the app caps a
+  name at 60 bytes, cut on a character boundary)
+- `days`: repeated `{ u32 yyyymmdd, u16 n, n x { u16 id, i16 start_min,
+  u8 grace_min, u8 0 } }`; `start_min` -1 = expected, but no fixed start
+  (flexible shift); a day with `n = 0` means nobody is expected.
+
+`version` is opaque to the terminal (the app uses FNV-1a over the blobs and
+the offset); the app pushes only when `roster_version` differs from its own.
+`tz_offset_min` updates the terminal's offset too: it decides what "today"
+means for lateness and the summary.
+
+`POST /reset` with scope `config` or `all` also clears the Telegram settings
+and the roster.
+
+### Wi-Fi fallback (firmware/main/net_wifi.c, decision D15)
+| method | path | purpose |
+|---|---|---|
+| GET  | `/api/v1/wifi` | `configured`, `ssid`, `state` (off/connecting/connected/failed), `ip`, `rssi`, `last_error`, `active` (eth/wifi/none), `eth_link` |
+| POST | `/api/v1/wifi` | `{ ssid, password }`; empty `ssid` forgets; password empty (open) or 8-64 |
+| GET  | `/api/v1/wifi/scan` | `{ networks: [{ ssid, rssi, secure }] }`, strongest first; blocks ~3 s |
+
+The password is write-only. `/info` and `/health` also report `net` (the
+interface in use) and `ip` is that interface's address. `POST /reset` with
+`config` or `all` forgets the Wi-Fi network.
+
 ### Template backup
 | method | path | purpose |
 |---|---|---|

@@ -49,12 +49,13 @@ class AttendanceApp extends StatelessWidget {
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: settings.themeMode,
-          home: AppScope(
-            settings: settings,
-            db: db,
-            sync: sync,
-            child: const AppShell(),
-          ),
+          // Above the Navigator, not around `home`: pushed pages (Shifts,
+          // Telegram) and dialogs are siblings of the home route, so a scope
+          // wrapped around `home` was invisible to them and every
+          // AppScope.of() there returned null.
+          builder: (context, child) =>
+              AppScope(settings: settings, db: db, sync: sync, child: child!),
+          home: const AppShell(),
         );
       },
     );

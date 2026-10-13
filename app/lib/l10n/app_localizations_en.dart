@@ -969,4 +969,212 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordRemoved => 'Password removed';
+
+  @override
+  String get tgTitle => 'Telegram alerts';
+
+  @override
+  String get tgTileHelp =>
+      'Check-ins, late arrivals and a daily summary, sent by the terminal';
+
+  @override
+  String get tgIntro =>
+      'The terminal sends these itself, so they keep arriving with this computer off. It judges lateness against the shifts this app sends it on every sync, two weeks ahead.';
+
+  @override
+  String get tgActive => 'Active. The terminal is sending alerts.';
+
+  @override
+  String get tgNotActive =>
+      'Not active. Set a bot and chat below, and switch alerts on.';
+
+  @override
+  String tgCounters(int sent, int failed, int dropped) {
+    return 'Sent $sent · failed attempts $failed · gave up $dropped';
+  }
+
+  @override
+  String tgLastError(String error) {
+    return 'Last problem: $error';
+  }
+
+  @override
+  String get tgNoRoster =>
+      'The terminal has no schedule yet, so it cannot tell who is late. It gets one on the next sync after saving.';
+
+  @override
+  String tgRoster(int names, String from, String to) {
+    return 'Schedule on the terminal: $names names, $from to $to';
+  }
+
+  @override
+  String get tgStepBot => '1. Bot';
+
+  @override
+  String get tgStepBotHelp =>
+      'In Telegram, open @BotFather, send /newbot and follow the steps. It gives you a token: paste it here.';
+
+  @override
+  String get tgBotToken => 'Bot token';
+
+  @override
+  String tgTokenSet(String hint) {
+    return 'A token ending in …$hint is set. Leave empty to keep it.';
+  }
+
+  @override
+  String get tgTokenInvalid =>
+      'That does not look like a bot token (123456789:AA…)';
+
+  @override
+  String get tgTokenNeededForFind => 'Paste the bot token first';
+
+  @override
+  String get tgCheckToken => 'Check token';
+
+  @override
+  String get tgStepChat => '2. Where to send';
+
+  @override
+  String get tgStepChatHelp =>
+      'Open your new bot in Telegram and send it /start (or add it to a group and send a message there), then click Find.';
+
+  @override
+  String get tgChatId => 'Chat ID';
+
+  @override
+  String get tgFindChat => 'Find';
+
+  @override
+  String get tgNoChats =>
+      'No messages to the bot yet. Send it /start in Telegram, then click Find again.';
+
+  @override
+  String get tgStepWhat => '3. What to send';
+
+  @override
+  String get tgEnabled => 'Send alerts';
+
+  @override
+  String get tgEachPunch => 'Every check-in and check-out';
+
+  @override
+  String get tgEachPunchHelp =>
+      'One message per scan. Can be a lot with many staff.';
+
+  @override
+  String get tgLate => 'Late arrivals';
+
+  @override
+  String get tgLateHelp =>
+      'When the first check-in of the day is past the shift\'s grace period.';
+
+  @override
+  String get tgSummary => 'Daily summary';
+
+  @override
+  String get tgSummaryHelp =>
+      'Who came, who was late, who is absent, who has not checked out.';
+
+  @override
+  String tgSummaryAt(String time) {
+    return 'Send at $time';
+  }
+
+  @override
+  String get tgSendTest => 'Send test message';
+
+  @override
+  String get tgSendSummary => 'Send summary now';
+
+  @override
+  String get tgQueued => 'Sent to the terminal. Checking delivery…';
+
+  @override
+  String get wifiTitle => 'Wi-Fi fallback';
+
+  @override
+  String get wifiTileHelp =>
+      'Used only when the Ethernet cable is not connected';
+
+  @override
+  String get wifiIntro =>
+      'Ethernet stays the main connection. If the cable has no connection for 20 seconds, the terminal joins this Wi-Fi network instead, and goes back to the cable once it has been working again for a minute. Set it now, while the app can reach the terminal.';
+
+  @override
+  String get wifiActiveEth => 'The terminal is on Ethernet.';
+
+  @override
+  String wifiActiveWifi(String ip) {
+    return 'The terminal is on Wi-Fi at $ip (no Ethernet).';
+  }
+
+  @override
+  String get wifiActiveNone => 'The terminal reports no connection.';
+
+  @override
+  String get wifiNotSet =>
+      'No Wi-Fi network set. Without one, an unplugged cable means no connection.';
+
+  @override
+  String wifiStandby(String ssid) {
+    return 'Standing by: will use \"$ssid\" if the cable is unplugged.';
+  }
+
+  @override
+  String wifiConnecting(String ssid) {
+    return 'Connecting to \"$ssid\"…';
+  }
+
+  @override
+  String wifiConnected(String ssid, int rssi) {
+    return 'Connected to \"$ssid\", signal $rssi dBm.';
+  }
+
+  @override
+  String wifiFailed(String ssid, String error) {
+    return 'Cannot connect to \"$ssid\": $error. Still retrying.';
+  }
+
+  @override
+  String get wifiNetwork => 'Network';
+
+  @override
+  String get wifiSsid => 'Network name (SSID)';
+
+  @override
+  String get wifiScan => 'Scan';
+
+  @override
+  String get wifiScanning =>
+      'The terminal is listening for networks. This takes a few seconds.';
+
+  @override
+  String get wifiNoneFound => 'No networks found near the terminal.';
+
+  @override
+  String get wifiOpen => 'open';
+
+  @override
+  String get wifiPassword => 'Password';
+
+  @override
+  String get wifiPasswordKeep =>
+      'Type the password again when you change the network';
+
+  @override
+  String get wifiPasswordHelp =>
+      'Leave empty only for an open network. The terminal never sends the password back.';
+
+  @override
+  String get wifiPasswordShort => 'A Wi-Fi password has at least 8 characters';
+
+  @override
+  String get wifiShowPassword => 'Show password';
+
+  @override
+  String get wifiForget => 'Forget network';
+
+  @override
+  String get wifiForgotten => 'Wi-Fi network forgotten';
 }

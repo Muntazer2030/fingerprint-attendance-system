@@ -133,6 +133,86 @@ class ApiClient {
     await _send('POST', '/reset', body: {'scope': scope});
   }
 
+  // --- wifi fallback -----------------------------------------------------
+
+  Future<WifiStatus> wifiStatus() async =>
+      WifiStatus.fromJson(await _get('/wifi'));
+
+  /// An empty [ssid] forgets the network. An empty [password] is an open one.
+  Future<WifiStatus> setWifi(String ssid, String password) async =>
+      WifiStatus.fromJson(
+        await _send(
+          'POST',
+          '/wifi',
+          body: {'ssid': ssid, 'password': password},
+        ),
+      );
+
+  /// The terminal listens for a few seconds, so this is slow by design.
+  Future<List<WifiNetwork>> wifiScan() async {
+    final j = await _get('/wifi/scan');
+    return [
+      for (final n in (j['networks'] as List?) ?? const [])
+        WifiNetwork.fromJson((n as Map).cast<String, dynamic>()),
+    ];
+  }
+
+  // --- telegram ----------------------------------------------------------
+
+  Future<NotifyStatus> notifyStatus() async =>
+      NotifyStatus.fromJson(await _get('/notify'));
+
+  /// Partial update: only the fields given are changed. An empty [botToken]
+  /// clears it; null leaves it as it is.
+  Future<NotifyStatus> setNotify({
+    bool? enabled,
+    bool? eachPunch,
+    bool? late,
+    int? summaryMinute,
+    bool clearSummary = false,
+    String? chatId,
+    String? botToken,
+  }) async {
+    final body = <String, dynamic>{
+      'enabled': ?enabled,
+      'each_punch': ?eachPunch,
+      'late': ?late,
+      'chat_id': ?chatId,
+      'bot_token': ?botToken,
+    };
+    if (clearSummary) {
+      body['summary_minute'] = -1;
+    } else if (summaryMinute != null) {
+      body['summary_minute'] = summaryMinute;
+    }
+    return NotifyStatus.fromJson(await _send('POST', '/notify', body: body));
+  }
+
+  Future<NotifyStatus> notifyTest() async =>
+      NotifyStatus.fromJson(await _send('POST', '/notify/test'));
+
+  Future<NotifyStatus> notifySummaryNow() async =>
+      NotifyStatus.fromJson(await _send('POST', '/notify/summary'));
+
+  /// Names and expected start times for the next days; see RosterPayload.
+  Future<NotifyStatus> pushRoster({
+    required int version,
+    required List<int> names,
+    required List<int> days,
+    required int tzOffsetMin,
+  }) async => NotifyStatus.fromJson(
+    await _send(
+      'POST',
+      '/roster',
+      body: {
+        'version': version,
+        'names_b64': base64Encode(names),
+        'days_b64': base64Encode(days),
+        'tz_offset_min': tzOffsetMin,
+      },
+    ),
+  );
+
   // --- events ------------------------------------------------------------
 
   Future<List<PunchEvent>> events({int since = 0, int limit = 100}) async =>

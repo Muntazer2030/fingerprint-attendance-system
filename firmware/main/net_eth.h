@@ -1,5 +1,6 @@
 #pragma once
 #include "esp_err.h"
+#include "esp_netif.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -7,8 +8,13 @@
  * Returns once the driver is started; the link may still be down. */
 esp_err_t net_eth_start(void);
 
-/* True once a DHCP lease has been obtained. */
+/* True once an address is assigned -- a DHCP lease, or the static fallback,
+ * which applies even with no cable. Pair with net_eth_link_up(). */
 bool net_eth_got_ip(void);
+
+/* The Ethernet interface, for choosing the default route. NULL if Ethernet
+ * failed to start. */
+esp_netif_t *net_eth_netif(void);
 
 /* True while the PHY reports carrier. */
 bool net_eth_link_up(void);

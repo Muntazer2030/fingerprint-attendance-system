@@ -1915,6 +1915,348 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password removed'**
   String get passwordRemoved;
+
+  /// No description provided for @tgTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Telegram alerts'**
+  String get tgTitle;
+
+  /// No description provided for @tgTileHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-ins, late arrivals and a daily summary, sent by the terminal'**
+  String get tgTileHelp;
+
+  /// No description provided for @tgIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'The terminal sends these itself, so they keep arriving with this computer off. It judges lateness against the shifts this app sends it on every sync, two weeks ahead.'**
+  String get tgIntro;
+
+  /// No description provided for @tgActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active. The terminal is sending alerts.'**
+  String get tgActive;
+
+  /// No description provided for @tgNotActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Not active. Set a bot and chat below, and switch alerts on.'**
+  String get tgNotActive;
+
+  /// No description provided for @tgCounters.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent {sent} · failed attempts {failed} · gave up {dropped}'**
+  String tgCounters(int sent, int failed, int dropped);
+
+  /// No description provided for @tgLastError.
+  ///
+  /// In en, this message translates to:
+  /// **'Last problem: {error}'**
+  String tgLastError(String error);
+
+  /// No description provided for @tgNoRoster.
+  ///
+  /// In en, this message translates to:
+  /// **'The terminal has no schedule yet, so it cannot tell who is late. It gets one on the next sync after saving.'**
+  String get tgNoRoster;
+
+  /// No description provided for @tgRoster.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule on the terminal: {names} names, {from} to {to}'**
+  String tgRoster(int names, String from, String to);
+
+  /// No description provided for @tgStepBot.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Bot'**
+  String get tgStepBot;
+
+  /// No description provided for @tgStepBotHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'In Telegram, open @BotFather, send /newbot and follow the steps. It gives you a token: paste it here.'**
+  String get tgStepBotHelp;
+
+  /// No description provided for @tgBotToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot token'**
+  String get tgBotToken;
+
+  /// No description provided for @tgTokenSet.
+  ///
+  /// In en, this message translates to:
+  /// **'A token ending in …{hint} is set. Leave empty to keep it.'**
+  String tgTokenSet(String hint);
+
+  /// No description provided for @tgTokenInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That does not look like a bot token (123456789:AA…)'**
+  String get tgTokenInvalid;
+
+  /// No description provided for @tgTokenNeededForFind.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the bot token first'**
+  String get tgTokenNeededForFind;
+
+  /// No description provided for @tgCheckToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Check token'**
+  String get tgCheckToken;
+
+  /// No description provided for @tgStepChat.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Where to send'**
+  String get tgStepChat;
+
+  /// No description provided for @tgStepChatHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Open your new bot in Telegram and send it /start (or add it to a group and send a message there), then click Find.'**
+  String get tgStepChatHelp;
+
+  /// No description provided for @tgChatId.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat ID'**
+  String get tgChatId;
+
+  /// No description provided for @tgFindChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Find'**
+  String get tgFindChat;
+
+  /// No description provided for @tgNoChats.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages to the bot yet. Send it /start in Telegram, then click Find again.'**
+  String get tgNoChats;
+
+  /// No description provided for @tgStepWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'3. What to send'**
+  String get tgStepWhat;
+
+  /// No description provided for @tgEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Send alerts'**
+  String get tgEnabled;
+
+  /// No description provided for @tgEachPunch.
+  ///
+  /// In en, this message translates to:
+  /// **'Every check-in and check-out'**
+  String get tgEachPunch;
+
+  /// No description provided for @tgEachPunchHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'One message per scan. Can be a lot with many staff.'**
+  String get tgEachPunchHelp;
+
+  /// No description provided for @tgLate.
+  ///
+  /// In en, this message translates to:
+  /// **'Late arrivals'**
+  String get tgLate;
+
+  /// No description provided for @tgLateHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'When the first check-in of the day is past the shift\'s grace period.'**
+  String get tgLateHelp;
+
+  /// No description provided for @tgSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily summary'**
+  String get tgSummary;
+
+  /// No description provided for @tgSummaryHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Who came, who was late, who is absent, who has not checked out.'**
+  String get tgSummaryHelp;
+
+  /// No description provided for @tgSummaryAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Send at {time}'**
+  String tgSummaryAt(String time);
+
+  /// No description provided for @tgSendTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Send test message'**
+  String get tgSendTest;
+
+  /// No description provided for @tgSendSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Send summary now'**
+  String get tgSendSummary;
+
+  /// No description provided for @tgQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to the terminal. Checking delivery…'**
+  String get tgQueued;
+
+  /// No description provided for @wifiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi fallback'**
+  String get wifiTitle;
+
+  /// No description provided for @wifiTileHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Used only when the Ethernet cable is not connected'**
+  String get wifiTileHelp;
+
+  /// No description provided for @wifiIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Ethernet stays the main connection. If the cable has no connection for 20 seconds, the terminal joins this Wi-Fi network instead, and goes back to the cable once it has been working again for a minute. Set it now, while the app can reach the terminal.'**
+  String get wifiIntro;
+
+  /// No description provided for @wifiActiveEth.
+  ///
+  /// In en, this message translates to:
+  /// **'The terminal is on Ethernet.'**
+  String get wifiActiveEth;
+
+  /// No description provided for @wifiActiveWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'The terminal is on Wi-Fi at {ip} (no Ethernet).'**
+  String wifiActiveWifi(String ip);
+
+  /// No description provided for @wifiActiveNone.
+  ///
+  /// In en, this message translates to:
+  /// **'The terminal reports no connection.'**
+  String get wifiActiveNone;
+
+  /// No description provided for @wifiNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Wi-Fi network set. Without one, an unplugged cable means no connection.'**
+  String get wifiNotSet;
+
+  /// No description provided for @wifiStandby.
+  ///
+  /// In en, this message translates to:
+  /// **'Standing by: will use \"{ssid}\" if the cable is unplugged.'**
+  String wifiStandby(String ssid);
+
+  /// No description provided for @wifiConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to \"{ssid}\"…'**
+  String wifiConnecting(String ssid);
+
+  /// No description provided for @wifiConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected to \"{ssid}\", signal {rssi} dBm.'**
+  String wifiConnected(String ssid, int rssi);
+
+  /// No description provided for @wifiFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot connect to \"{ssid}\": {error}. Still retrying.'**
+  String wifiFailed(String ssid, String error);
+
+  /// No description provided for @wifiNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get wifiNetwork;
+
+  /// No description provided for @wifiSsid.
+  ///
+  /// In en, this message translates to:
+  /// **'Network name (SSID)'**
+  String get wifiSsid;
+
+  /// No description provided for @wifiScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get wifiScan;
+
+  /// No description provided for @wifiScanning.
+  ///
+  /// In en, this message translates to:
+  /// **'The terminal is listening for networks. This takes a few seconds.'**
+  String get wifiScanning;
+
+  /// No description provided for @wifiNoneFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No networks found near the terminal.'**
+  String get wifiNoneFound;
+
+  /// No description provided for @wifiOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'open'**
+  String get wifiOpen;
+
+  /// No description provided for @wifiPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get wifiPassword;
+
+  /// No description provided for @wifiPasswordKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the password again when you change the network'**
+  String get wifiPasswordKeep;
+
+  /// No description provided for @wifiPasswordHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty only for an open network. The terminal never sends the password back.'**
+  String get wifiPasswordHelp;
+
+  /// No description provided for @wifiPasswordShort.
+  ///
+  /// In en, this message translates to:
+  /// **'A Wi-Fi password has at least 8 characters'**
+  String get wifiPasswordShort;
+
+  /// No description provided for @wifiShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get wifiShowPassword;
+
+  /// No description provided for @wifiForget.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget network'**
+  String get wifiForget;
+
+  /// No description provided for @wifiForgotten.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi network forgotten'**
+  String get wifiForgotten;
 }
 
 class _AppLocalizationsDelegate

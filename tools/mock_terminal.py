@@ -59,6 +59,13 @@ state = {
     "enroll": {"session_id": 0, "state": "idle", "slot": None, "reason": None,
                "employee_id": None, "finger": 0},
     "boot": time.time(),
+    # Telegram: the mock never calls Telegram, it records what it would send.
+    "notify": {"enabled": False, "each_punch": True, "late": True,
+               "summary_minute": -1, "chat_id": "", "bot_token": ""},
+    "notify_outbox": [],
+    # Wi-Fi fallback. The mock is always "on Ethernet", so Wi-Fi stays off.
+    "wifi": {"ssid": "", "password": ""},
+    "roster": {"version": 0, "names": 0, "days": 0, "first": 0, "last": 0},
 }
 
 DEFAULT_CONFIG = dict(state["config"])
@@ -99,6 +106,36 @@ def append_event(employee_id, direction, epoch=None, method="finger",
             emp["last_direction"] = direction
             emp["last_epoch"] = ev["epoch"]
         return ev
+
+
+def parse_names(b):
+    """{u16 id, u8 len, utf-8} repeated, as notify.c reads it. None if bad."""
+    out, p = {}, 0
+    while p < len(b):
+        if p + 3 > len(b) or p + 3 + b[p + 2] > len(b):
+            return None
+        out[int.from_bytes(b[p:p + 2], "little")] = \
+            b[p + 3:p + 3 + b[p + 2]].decode("utf-8", "replace")
+        p += 3 + b[p + 2]
+    return out
+
+
+def parse_days(b):
+    """{u32 yyyymmdd, u16 n, n x {u16 id, i16 start, u8 grace, u8 0}}."""
+    out, p = {}, 0
+    while p < len(b):
+        if p + 6 > len(b):
+            return None
+        day = int.from_bytes(b[p:p + 4], "little")
+        n = int.from_bytes(b[p + 4:p + 6], "little")
+        p += 6
+        if p + n * 6 > len(b) or not 20000101 <= day <= 21001231:
+            return None
+        out[day] = [(int.from_bytes(b[q:q + 2], "little"),
+                     int.from_bytes(b[q + 2:q + 4], "little", signed=True),
+                     b[q + 4]) for q in range(p, p + n * 6, 6)]
+        p += n * 6
+    return out
 
 
 def fingers_for(emp_id):
@@ -165,9 +202,30 @@ class Handler(BaseHTTPRequestHandler):
             print(f"  rejected Authorization: {got!r}", flush=True)
         self._send(401, {"error": "unauthorized"})
 
-    def _body(self):
+    def _notify_json(self):
+        n, r = state["notify"], state["roster"]
+        tok = n["bot_token"]
+        return {
+            "enabled": n["enabled"], "each_punch": n["each_punch"],
+            "late": n["late"], "summary_minute": n["summary_minute"],
+            "chat_id": n["chat_id"], "has_bot_token": bool(tok),
+            "bot_token_hint": tok[-4:] if len(tok) > 4 else "",
+            "sent": len(state["notify_outbox"]), "failed": 0, "dropped": 0,
+            "queued": 0, "last_ok_epoch": now_epoch() if state["notify_outbox"] else 0,
+            "last_error": "", "roster_version": r["version"],
+            "roster_days": r["days"], "roster_names": r["names"],
+            "roster_first_day": r["first"], "roster_last_day": r["last"],
+        }
+
+    def _wifi_json(self):
+        w = state["wifi"]
+        return {"configured": bool(w["ssid"]), "ssid": w["ssid"],
+                "state": "off", "ip": "0.0.0.0", "rssi": 0, "last_error": "",
+                "active": "eth", "eth_link": True}
+
+    def _body(self, limit=1024):
         n = int(self.headers.get("Content-Length") or 0)
-        if n <= 0 or n > 512:  # the firmware's read_body limit
+        if n <= 0 or n > limit:  # the firmware's read_body limit
             return None
         try:
             return json.loads(self.rfile.read(n))
@@ -231,6 +289,17 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, self._enroll_json())
             if path == "/api/v1/config":
                 return self._send(200, self._config_json())
+            if path == "/api/v1/notify":
+                return self._send(200, self._notify_json())
+            if path == "/api/v1/wifi":
+                return self._send(200, self._wifi_json())
+            if path == "/api/v1/wifi/scan":
+                time.sleep(1.5)  # the real scan blocks for a few seconds
+                return self._send(200, {"networks": [
+                    {"ssid": "Store-WiFi", "rssi": -48, "secure": True},
+                    {"ssid": "Store-Guest", "rssi": -61, "secure": False},
+                    {"ssid": "Neighbour 5G", "rssi": -83, "secure": True},
+                ]})
             if path == "/api/v1/screen":
                 fb = base64.b64encode(bytes(1024)).decode()
                 return self._send(200, {"width": 128, "height": 64,
@@ -273,13 +342,64 @@ class Handler(BaseHTTPRequestHandler):
                 state["enroll"].update(state="idle")
                 return self._send(200, self._enroll_json())
 
-        body = self._body()
+        # Also bodiless, like the firmware's handlers.
+        if path in ("/api/v1/notify/test", "/api/v1/notify/summary"):
+            with lock:
+                kind = "test" if path.endswith("test") else "summary"
+                state["notify_outbox"].append({"kind": kind, "at": now_epoch()})
+                return self._send(200, self._notify_json())
+
+        body = self._body(20 * 1024 if path == "/api/v1/roster" else 1024)
         if body is None:
             return self._bad("missing body")
         if body == "malformed":
             return self._bad("malformed json")
 
         with lock:
+            if path == "/api/v1/wifi":
+                ssid, pw = body.get("ssid"), body.get("password", "")
+                if not isinstance(ssid, str) or not isinstance(pw, str):
+                    return self._bad("ssid required")
+                if len(ssid.encode()) > 32 or len(pw) > 64 or 0 < len(pw) < 8:
+                    return self._bad("ssid up to 32 bytes; password empty or 8-64")
+                state["wifi"] = {"ssid": ssid, "password": pw if ssid else ""}
+                return self._send(200, self._wifi_json())
+            if path == "/api/v1/notify":
+                n = state["notify"]
+                for k in ("enabled", "each_punch", "late"):
+                    if isinstance(body.get(k), bool):
+                        n[k] = body[k]
+                if isinstance(body.get("summary_minute"), int):
+                    m = body["summary_minute"]
+                    n["summary_minute"] = m if 0 <= m < 1440 else -1
+                for k, cap in (("chat_id", 24), ("bot_token", 80)):
+                    if isinstance(body.get(k), str):
+                        if len(body[k]) >= cap:
+                            return self._bad(f"{k} too long")
+                        n[k] = body[k]
+                return self._send(200, self._notify_json())
+            if path == "/api/v1/roster":
+                try:
+                    names = base64.b64decode(body["names_b64"])
+                    days = base64.b64decode(body["days_b64"])
+                    version = int(body["version"])
+                except (KeyError, ValueError, TypeError):
+                    return self._bad("version, names_b64 and days_b64 required")
+                parsed = parse_days(days)
+                if parsed is None or parse_names(names) is None:
+                    return self._bad("roster rejected")
+                if 8 + len(names) + len(days) > 3 * 4096 - 12:
+                    return self._bad("roster too large")
+                state["roster"] = {
+                    "version": version, "names": len(parse_names(names)),
+                    "days": len(parsed),
+                    "first": min(parsed) if parsed else 0,
+                    "last": max(parsed) if parsed else 0,
+                    "names_map": parse_names(names), "days_map": parsed,
+                }
+                if isinstance(body.get("tz_offset_min"), int):
+                    state["config"]["tz_offset_min"] = body["tz_offset_min"]
+                return self._send(200, self._notify_json())
             if path == "/api/v1/events/ack":
                 if not isinstance(body.get("through_seq"), (int, float)):
                     return self._bad("through_seq required")
@@ -394,6 +514,12 @@ class Handler(BaseHTTPRequestHandler):
                 if scope in ("config", "all"):
                     state["config"] = dict(DEFAULT_CONFIG)
                     state["strings"].clear()
+                    # Like the firmware: Telegram, roster and Wi-Fi go too.
+                    state["notify"].update(enabled=False, summary_minute=-1,
+                                           chat_id="", bot_token="")
+                    state["roster"] = {"version": 0, "names": 0, "days": 0,
+                                       "first": 0, "last": 0}
+                    state["wifi"] = {"ssid": "", "password": ""}
                     done["config_reset"] = True
                 if not any(done.values()):
                     return self._bad("unknown scope")

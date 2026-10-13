@@ -22,6 +22,8 @@
 #include "attend.h"
 #include "cfg.h"
 #include "timesync.h"
+#include "notify.h"
+#include "net_wifi.h"
 
 static const char *TAG = "att";
 
@@ -232,7 +234,12 @@ void app_main(void)
      * buffers ~40k events locally and syncs when the network returns. A dead
      * Ethernet module must not stop staff clocking in. */
     if (net_eth_start() != ESP_OK) {
-        ESP_LOGW(TAG, "running offline - events will buffer until network returns");
+        ESP_LOGW(TAG, "ethernet unavailable - wifi fallback only, if configured");
+    }
+    /* Regardless of Ethernet: a dead or unplugged ENC28J60 is exactly when the
+     * fallback matters. */
+    if (net_wifi_start() != ESP_OK) {
+        ESP_LOGW(TAG, "wifi fallback could not start");
     }
 
     timesync_start();
@@ -242,6 +249,10 @@ void app_main(void)
     }
 
     users_init();
+    /* Before the scan loop, so the first punch already has somewhere to go. */
+    if (notify_init() != ESP_OK) {
+        ESP_LOGW(TAG, "telegram notifications unavailable");
+    }
     if (attend_start() != ESP_OK) {
         ESP_LOGE(TAG, "attendance task failed to start");
     }

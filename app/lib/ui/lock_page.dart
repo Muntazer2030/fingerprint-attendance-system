@@ -114,8 +114,9 @@ class PasswordDialog extends StatefulWidget {
 
   final PasswordAction action;
 
-  /// Passed in rather than looked up: a dialog sits on the navigator above
-  /// AppScope, so AppScope.settingsOf(context) finds nothing there.
+  /// Passed in explicitly so the dialog does not depend on where it is shown.
+  /// (It once looked settings up through AppScope while AppScope only wrapped
+  /// the home route, and Save crashed.)
   final Settings settings;
 
   @override

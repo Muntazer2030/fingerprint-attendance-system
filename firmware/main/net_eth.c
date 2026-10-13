@@ -415,6 +415,7 @@ esp_err_t net_eth_start(void)
 }
 
 bool net_eth_got_ip(void) { return s_got_ip; }
+esp_netif_t *net_eth_netif(void) { return s_eth_netif; }
 bool net_eth_link_up(void) { return s_link_up; }
 const char *net_eth_ip(void) { return s_ip; }
 

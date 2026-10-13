@@ -41,6 +41,8 @@ tests, a full end-to-end run of the real Windows build against
 | Shift rules + timesheet (+ upcoming / at-work days) | works |
 | .xlsx export (Arabic RTL) | works, verified E2E |
 | Arabic/English + RTL, dark mode | works, screenshots checked |
+| Wi-Fi fallback when Ethernet is unplugged (D15), set from Device -> Wi-Fi | app + mock + widget tests 2026-10-13; firmware compiles, **not yet run on hardware** |
+| Telegram alerts sent by the terminal (D14): per punch, late, daily summary | app side + mock verified 2026-10-12; firmware compiles, **not yet run on hardware** |
 | App password (lock on open, lock button, set/change/remove in Settings) | works; tested, checked in the web build (2026-10-12) |
 | Payroll: wages, overtime pay, late/absence cuts, bonuses/advances, mark paid (frozen), .xlsx | works; unit + widget tested, checked in the web build (2026-10-11). Policy in decisions.md D13 |
 
@@ -154,6 +156,17 @@ tools/              api.ps1, screenshot.py, simulate_screen.py
 - **`max_uri_handlers` must exceed the route count.** Sizing it exactly dropped
   the wildcard OPTIONS handler, so every browser request 405'd and the whole app
   broke. Registration failures are now logged.
+- **AppScope wraps the Navigator** (`MaterialApp.builder`), not `home`. It
+  used to wrap `home`, which made every pushed page and dialog unable to
+  reach it (Timesheet -> Shifts crashed). `test/app_scope_test.dart` guards it.
+- **The `storage` partition has a sector map** in `firmware/main/store.h`.
+  Add new records there; never write sectors another module owns.
+- **"Ethernet is up" means link AND address** (`net_wifi.c` eth_usable).
+  `net_eth_got_ip()` alone is true with no cable once the static fallback
+  fires. Use `net_any_got_ip()` / `net_active_ip()` for "is it online".
+- **The roster's binary layout is a wire contract** between
+  `roster_push.dart` and `notify.c` (documented in protocol.md and
+  notify.h). `test/roster_push_test.dart` parses it the way the C does.
 - **App password is a lock, not encryption.** Settings stores a salted,
   iterated SHA-256 (`app_password` in shared preferences); the database itself
   is not encrypted. Forgotten password: close the app and delete the

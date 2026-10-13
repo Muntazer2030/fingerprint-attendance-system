@@ -36,6 +36,8 @@
 #include "timesync.h"
 #include "cfg.h"
 #include "oled.h"
+#include "notify.h"
+#include "net_wifi.h"
 #include "mbedtls/base64.h"
 
 static const char *TAG = "api";
@@ -165,7 +167,8 @@ static esp_err_t info_get(httpd_req_t *req)
     cJSON_AddStringToObject(o, "fw_version", app->version);
     cJSON_AddStringToObject(o, "idf", IDF_VER);
     cJSON_AddNumberToObject(o, "uptime_s", esp_timer_get_time() / 1000000);
-    cJSON_AddStringToObject(o, "ip", net_eth_ip());
+    cJSON_AddStringToObject(o, "ip", net_active_ip());
+    cJSON_AddStringToObject(o, "net", net_active_iface());
     cJSON_AddNumberToObject(o, "epoch", (double)now);
     cJSON_AddBoolToObject(o, "time_synced", timesync_is_authoritative());
     cJSON_AddStringToObject(o, "time_source", timesync_source_str());
@@ -179,8 +182,9 @@ static esp_err_t health_get(httpd_req_t *req)
 
     cJSON *o = cJSON_CreateObject();
     cJSON_AddBoolToObject(o, "eth_link", net_eth_link_up());
-    cJSON_AddBoolToObject(o, "has_ip", net_eth_got_ip());
-    cJSON_AddStringToObject(o, "ip", net_eth_ip());
+    cJSON_AddBoolToObject(o, "has_ip", net_any_got_ip());
+    cJSON_AddStringToObject(o, "ip", net_active_ip());
+    cJSON_AddStringToObject(o, "net", net_active_iface());
     cJSON_AddNumberToObject(o, "heap_free", esp_get_free_heap_size());
     cJSON_AddNumberToObject(o, "heap_min", esp_get_minimum_free_heap_size());
     cJSON_AddNumberToObject(o, "uptime_s", esp_timer_get_time() / 1000000);
@@ -248,10 +252,11 @@ static esp_err_t events_get(httpd_req_t *req)
     return send_json(req, o);
 }
 
-/* Reads the whole body into a NUL-terminated buffer. Bodies here are tiny. */
-static char *read_body(httpd_req_t *req)
+/* Reads the whole body into a NUL-terminated buffer, refusing anything larger
+ * than [max]. Most bodies are tiny; the roster is the exception. */
+static char *read_body_max(httpd_req_t *req, int max)
 {
-    if (req->content_len <= 0 || req->content_len > 512) {
+    if (req->content_len <= 0 || req->content_len > max) {
         return NULL;
     }
     char *buf = malloc(req->content_len + 1);
@@ -270,6 +275,8 @@ static char *read_body(httpd_req_t *req)
     buf[off] = '\0';
     return buf;
 }
+
+static char *read_body(httpd_req_t *req) { return read_body_max(req, 1024); }
 
 static esp_err_t bad_request(httpd_req_t *req, const char *why)
 {
@@ -416,6 +423,8 @@ static esp_err_t reset_post(httpd_req_t *req)
 
     if (all || strcmp(scope, "config") == 0) {
         cfg_reset();
+        notify_reset();
+        net_wifi_reset();
         did_config = true;
     }
 
@@ -774,6 +783,263 @@ static esp_err_t enroll_cancel_h(httpd_req_t *req)
     return send_json(req, enroll_json());
 }
 
+/* ------------------------------------------------------------- notify -- */
+
+/* The bot token is never sent back in full: anyone holding it can post as the
+ * bot. The app shows the last few characters to confirm which one is set. */
+static cJSON *notify_json(void)
+{
+    notify_cfg_t c;
+    notify_status_t st;
+    notify_get_cfg(&c);
+    notify_get_status(&st);
+
+    cJSON *o = cJSON_CreateObject();
+    cJSON_AddBoolToObject(o, "enabled", c.enabled);
+    cJSON_AddBoolToObject(o, "each_punch", c.each_punch);
+    cJSON_AddBoolToObject(o, "late", c.late);
+    cJSON_AddNumberToObject(o, "summary_minute", c.summary_min);
+    cJSON_AddStringToObject(o, "chat_id", c.chat_id);
+    size_t tl = strlen(c.bot_token);
+    cJSON_AddBoolToObject(o, "has_bot_token", tl > 0);
+    cJSON_AddStringToObject(o, "bot_token_hint", tl > 4 ? c.bot_token + tl - 4 : "");
+
+    cJSON_AddNumberToObject(o, "sent", st.sent);
+    cJSON_AddNumberToObject(o, "failed", st.failed);
+    cJSON_AddNumberToObject(o, "dropped", st.dropped);
+    cJSON_AddNumberToObject(o, "queued", st.queued);
+    cJSON_AddNumberToObject(o, "last_ok_epoch", st.last_ok_epoch);
+    cJSON_AddStringToObject(o, "last_error", st.last_error);
+    cJSON_AddNumberToObject(o, "roster_version", st.roster_version);
+    cJSON_AddNumberToObject(o, "roster_days", st.roster_days);
+    cJSON_AddNumberToObject(o, "roster_names", st.roster_names);
+    cJSON_AddNumberToObject(o, "roster_first_day", st.roster_first_day);
+    cJSON_AddNumberToObject(o, "roster_last_day", st.roster_last_day);
+    return o;
+}
+
+static esp_err_t notify_get_h(httpd_req_t *req)
+{
+    if (!authorized(req)) return deny(req);
+    return send_json(req, notify_json());
+}
+
+/* Partial update, like /config. An empty bot_token clears it. */
+static esp_err_t notify_post_h(httpd_req_t *req)
+{
+    if (!authorized(req)) return deny(req);
+
+    char *body = read_body(req);
+    if (!body) return bad_request(req, "missing body");
+    cJSON *in = cJSON_Parse(body);
+    free(body);
+    if (!in) return bad_request(req, "malformed json");
+
+    notify_cfg_t c;
+    notify_get_cfg(&c);
+    cJSON *v;
+    if ((v = cJSON_GetObjectItem(in, "enabled")) && cJSON_IsBool(v)) {
+        c.enabled = cJSON_IsTrue(v);
+    }
+    if ((v = cJSON_GetObjectItem(in, "each_punch")) && cJSON_IsBool(v)) {
+        c.each_punch = cJSON_IsTrue(v);
+    }
+    if ((v = cJSON_GetObjectItem(in, "late")) && cJSON_IsBool(v)) {
+        c.late = cJSON_IsTrue(v);
+    }
+    if ((v = cJSON_GetObjectItem(in, "summary_minute")) && cJSON_IsNumber(v)) {
+        c.summary_min = (int16_t)v->valuedouble;
+    }
+    if ((v = cJSON_GetObjectItem(in, "chat_id")) && cJSON_IsString(v)) {
+        if (strlen(v->valuestring) >= sizeof(c.chat_id)) {
+            cJSON_Delete(in);
+            return bad_request(req, "chat_id too long");
+        }
+        strcpy(c.chat_id, v->valuestring);
+    }
+    if ((v = cJSON_GetObjectItem(in, "bot_token")) && cJSON_IsString(v)) {
+        if (strlen(v->valuestring) >= sizeof(c.bot_token)) {
+            cJSON_Delete(in);
+            return bad_request(req, "bot_token too long");
+        }
+        strcpy(c.bot_token, v->valuestring);
+    }
+    cJSON_Delete(in);
+
+    if (notify_set_cfg(&c) != ESP_OK) {
+        return bad_request(req, "could not store settings");
+    }
+    return send_json(req, notify_json());
+}
+
+static esp_err_t notify_test_h(httpd_req_t *req)
+{
+    if (!authorized(req)) return deny(req);
+    if (notify_test() != ESP_OK) {
+        return bad_request(req, "notifier busy or not running");
+    }
+    return send_json(req, notify_json());
+}
+
+static esp_err_t notify_summary_h(httpd_req_t *req)
+{
+    if (!authorized(req)) return deny(req);
+    if (notify_summary_now() != ESP_OK) {
+        return bad_request(req, "notifier busy or not running");
+    }
+    return send_json(req, notify_json());
+}
+
+/* Names as text and who is expected when, for the next couple of weeks. The
+ * PC sends it only when it changed, and the terminal judges lateness and the
+ * daily summary against it -- the PC can be off in between. */
+static esp_err_t roster_post_h(httpd_req_t *req)
+{
+    if (!authorized(req)) return deny(req);
+
+    char *body = read_body_max(req, 20 * 1024);
+    if (!body) return bad_request(req, "missing or oversized body");
+    cJSON *in = cJSON_Parse(body);
+    free(body);
+    if (!in) return bad_request(req, "malformed json");
+
+    cJSON *jv = cJSON_GetObjectItem(in, "version");
+    cJSON *jn = cJSON_GetObjectItem(in, "names_b64");
+    cJSON *jd = cJSON_GetObjectItem(in, "days_b64");
+    cJSON *jtz = cJSON_GetObjectItem(in, "tz_offset_min");
+    if (!cJSON_IsNumber(jv) || !cJSON_IsString(jn) || !cJSON_IsString(jd)) {
+        cJSON_Delete(in);
+        return bad_request(req, "version, names_b64 and days_b64 required");
+    }
+
+    size_t nb = strlen(jn->valuestring), db = strlen(jd->valuestring);
+    uint8_t *names = malloc(nb * 3 / 4 + 4);
+    uint8_t *days = malloc(db * 3 / 4 + 4);
+    size_t nlen = 0, dlen = 0;
+    esp_err_t err = ESP_ERR_INVALID_ARG;
+    if (names && days &&
+        mbedtls_base64_decode(names, nb * 3 / 4 + 4, &nlen,
+                              (const unsigned char *)jn->valuestring, nb) == 0 &&
+        mbedtls_base64_decode(days, db * 3 / 4 + 4, &dlen,
+                              (const unsigned char *)jd->valuestring, db) == 0) {
+        err = notify_set_roster((uint32_t)jv->valuedouble, names, nlen, days, dlen);
+    }
+    free(names);
+    free(days);
+
+    /* The local date is what "today" means for lateness and the summary, so
+     * the PC keeps the terminal's offset in step with its own (DST included). */
+    if (err == ESP_OK && cJSON_IsNumber(jtz)) {
+        int16_t tz = (int16_t)jtz->valuedouble;
+        if (tz != cfg()->tz_offset_min) {
+            device_cfg_t next = *cfg();
+            next.tz_offset_min = tz;
+            cfg_update(&next);
+        }
+    }
+    cJSON_Delete(in);
+
+    if (err != ESP_OK) {
+        return bad_request(req, err == ESP_ERR_INVALID_SIZE ? "roster too large"
+                                                            : "roster rejected");
+    }
+    return send_json(req, notify_json());
+}
+
+/* --------------------------------------------------------------- wifi -- */
+
+static const char *wifi_state_str(net_wifi_state_t s)
+{
+    switch (s) {
+    case NET_WIFI_CONNECTING: return "connecting";
+    case NET_WIFI_CONNECTED:  return "connected";
+    case NET_WIFI_FAILED:     return "failed";
+    default:                  return "off";
+    }
+}
+
+/* The password is write-only, like the bot token. */
+static cJSON *wifi_json(void)
+{
+    net_wifi_status_t st;
+    net_wifi_get_status(&st);
+    cJSON *o = cJSON_CreateObject();
+    cJSON_AddBoolToObject(o, "configured", st.configured);
+    cJSON_AddStringToObject(o, "ssid", st.ssid);
+    cJSON_AddStringToObject(o, "state", wifi_state_str(st.state));
+    cJSON_AddStringToObject(o, "ip", st.ip);
+    cJSON_AddNumberToObject(o, "rssi", st.rssi);
+    cJSON_AddStringToObject(o, "last_error", st.last_error);
+    cJSON_AddStringToObject(o, "active", net_active_iface());
+    cJSON_AddBoolToObject(o, "eth_link", net_eth_link_up());
+    return o;
+}
+
+static esp_err_t wifi_get_h(httpd_req_t *req)
+{
+    if (!authorized(req)) return deny(req);
+    return send_json(req, wifi_json());
+}
+
+/* { "ssid": "...", "password": "..." }. An empty ssid forgets the network. */
+static esp_err_t wifi_post_h(httpd_req_t *req)
+{
+    if (!authorized(req)) return deny(req);
+
+    char *body = read_body(req);
+    if (!body) return bad_request(req, "missing body");
+    cJSON *in = cJSON_Parse(body);
+    free(body);
+    if (!in) return bad_request(req, "malformed json");
+
+    cJSON *js = cJSON_GetObjectItem(in, "ssid");
+    cJSON *jp = cJSON_GetObjectItem(in, "password");
+    if (!cJSON_IsString(js)) {
+        cJSON_Delete(in);
+        return bad_request(req, "ssid required");
+    }
+    esp_err_t err = net_wifi_set_credentials(
+        js->valuestring, cJSON_IsString(jp) ? jp->valuestring : "");
+    cJSON_Delete(in);
+    if (err == ESP_ERR_INVALID_ARG) {
+        return bad_request(req, "ssid up to 32 bytes; password empty or 8-64");
+    }
+    if (err != ESP_OK) {
+        return bad_request(req, "could not store wifi settings");
+    }
+    return send_json(req, wifi_json());
+}
+
+static esp_err_t wifi_scan_h(httpd_req_t *req)
+{
+    if (!authorized(req)) return deny(req);
+
+    net_wifi_ap_t *aps = calloc(20, sizeof(net_wifi_ap_t));
+    if (!aps) {
+        add_cors(req);
+        httpd_resp_set_status(req, "503 Service Unavailable");
+        return httpd_resp_sendstr(req, "{\"error\":\"oom\"}");
+    }
+    size_t n = 0;
+    esp_err_t err = net_wifi_scan(aps, 20, &n);
+    if (err != ESP_OK) {
+        free(aps);
+        return bad_request(req, "scan failed - wifi busy connecting, try again");
+    }
+    cJSON *arr = cJSON_CreateArray();
+    for (size_t i = 0; i < n; i++) {
+        cJSON *a = cJSON_CreateObject();
+        cJSON_AddStringToObject(a, "ssid", aps[i].ssid);
+        cJSON_AddNumberToObject(a, "rssi", aps[i].rssi);
+        cJSON_AddBoolToObject(a, "secure", aps[i].secure);
+        cJSON_AddItemToArray(arr, a);
+    }
+    free(aps);
+    cJSON *o = cJSON_CreateObject();
+    cJSON_AddItemToObject(o, "networks", arr);
+    return send_json(req, o);
+}
+
 /* ---------------------------------------------------------------- start -- */
 
 static const httpd_uri_t URIS[] = {
@@ -793,6 +1059,14 @@ static const httpd_uri_t URIS[] = {
     { .uri = "/api/v1/strings",       .method = HTTP_POST,   .handler = strings_post    },
     { .uri = "/api/v1/reset",         .method = HTTP_POST,   .handler = reset_post      },
     { .uri = "/api/v1/screen",        .method = HTTP_GET,    .handler = screen_get      },
+    { .uri = "/api/v1/notify",         .method = HTTP_GET,  .handler = notify_get_h     },
+    { .uri = "/api/v1/notify",         .method = HTTP_POST, .handler = notify_post_h    },
+    { .uri = "/api/v1/notify/test",    .method = HTTP_POST, .handler = notify_test_h    },
+    { .uri = "/api/v1/notify/summary", .method = HTTP_POST, .handler = notify_summary_h },
+    { .uri = "/api/v1/roster",         .method = HTTP_POST, .handler = roster_post_h    },
+    { .uri = "/api/v1/wifi",           .method = HTTP_GET,  .handler = wifi_get_h       },
+    { .uri = "/api/v1/wifi",           .method = HTTP_POST, .handler = wifi_post_h      },
+    { .uri = "/api/v1/wifi/scan",      .method = HTTP_GET,  .handler = wifi_scan_h      },
 };
 
 esp_err_t api_server_start(void)

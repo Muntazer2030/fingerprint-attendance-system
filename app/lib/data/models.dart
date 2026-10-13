@@ -356,3 +356,150 @@ class DeviceConfig {
   /// near-static content around the clock.
   bool get burnInRisk => idleDimSeconds == 0 && idleOffSeconds == 0;
 }
+
+/// The terminal's Telegram settings and delivery counters. Mirrors
+/// notify_cfg_t / notify_status_t in firmware/main/notify.h.
+///
+/// The bot token is write-only: the terminal reports whether one is set and
+/// its last four characters, never the token itself.
+class NotifyStatus {
+  const NotifyStatus({
+    required this.enabled,
+    required this.eachPunch,
+    required this.late,
+    required this.summaryMinute,
+    required this.chatId,
+    required this.hasBotToken,
+    required this.botTokenHint,
+    required this.sent,
+    required this.failed,
+    required this.dropped,
+    required this.queued,
+    required this.lastOkEpoch,
+    required this.lastError,
+    required this.rosterVersion,
+    required this.rosterDays,
+    required this.rosterNames,
+    required this.rosterFirstDay,
+    required this.rosterLastDay,
+  });
+
+  final bool enabled;
+  final bool eachPunch;
+  final bool late;
+
+  /// Local minute of the day for the daily summary; null when switched off.
+  final int? summaryMinute;
+  final String chatId;
+  final bool hasBotToken;
+  final String botTokenHint;
+
+  final int sent;
+  final int failed;
+  final int dropped;
+  final int queued;
+  final int lastOkEpoch;
+  final String lastError;
+
+  final int rosterVersion;
+  final int rosterDays;
+  final int rosterNames;
+
+  /// yyyymmdd, 0 when the terminal has no roster.
+  final int rosterFirstDay;
+  final int rosterLastDay;
+
+  factory NotifyStatus.fromJson(Map<String, dynamic> j) {
+    int n(String k) => (j[k] as num?)?.toInt() ?? 0;
+    final summary = n('summary_minute');
+    return NotifyStatus(
+      enabled: j['enabled'] as bool? ?? false,
+      eachPunch: j['each_punch'] as bool? ?? false,
+      late: j['late'] as bool? ?? false,
+      summaryMinute: summary >= 0 && summary < 1440 ? summary : null,
+      chatId: j['chat_id'] as String? ?? '',
+      hasBotToken: j['has_bot_token'] as bool? ?? false,
+      botTokenHint: j['bot_token_hint'] as String? ?? '',
+      sent: n('sent'),
+      failed: n('failed'),
+      dropped: n('dropped'),
+      queued: n('queued'),
+      lastOkEpoch: n('last_ok_epoch'),
+      lastError: j['last_error'] as String? ?? '',
+      rosterVersion: n('roster_version'),
+      rosterDays: n('roster_days'),
+      rosterNames: n('roster_names'),
+      rosterFirstDay: n('roster_first_day'),
+      rosterLastDay: n('roster_last_day'),
+    );
+  }
+}
+
+/// The terminal's Wi-Fi fallback. Mirrors net_wifi_status_t in
+/// firmware/main/net_wifi.h. The password is write-only and never reported.
+class WifiStatus {
+  const WifiStatus({
+    required this.configured,
+    required this.ssid,
+    required this.state,
+    required this.ip,
+    required this.rssi,
+    required this.lastError,
+    required this.active,
+    required this.ethLink,
+  });
+
+  final bool configured;
+  final String ssid;
+
+  /// off, connecting, connected or failed. "off" is normal while the
+  /// Ethernet cable works: Wi-Fi is only a fallback.
+  final String state;
+  final String ip;
+  final int rssi;
+  final String lastError;
+
+  /// The interface the terminal is reachable on: eth, wifi or none.
+  final String active;
+  final bool ethLink;
+
+  factory WifiStatus.fromJson(Map<String, dynamic> j) => WifiStatus(
+    configured: j['configured'] as bool? ?? false,
+    ssid: j['ssid'] as String? ?? '',
+    state: j['state'] as String? ?? 'off',
+    ip: j['ip'] as String? ?? '0.0.0.0',
+    rssi: (j['rssi'] as num?)?.toInt() ?? 0,
+    lastError: j['last_error'] as String? ?? '',
+    active: j['active'] as String? ?? 'eth',
+    ethLink: j['eth_link'] as bool? ?? true,
+  );
+}
+
+class WifiNetwork {
+  const WifiNetwork({
+    required this.ssid,
+    required this.rssi,
+    required this.secure,
+  });
+
+  final String ssid;
+  final int rssi;
+  final bool secure;
+
+  /// 0-4 bars, the way phones show it.
+  int get bars => rssi >= -55
+      ? 4
+      : rssi >= -65
+      ? 3
+      : rssi >= -75
+      ? 2
+      : rssi >= -85
+      ? 1
+      : 0;
+
+  factory WifiNetwork.fromJson(Map<String, dynamic> j) => WifiNetwork(
+    ssid: j['ssid'] as String? ?? '',
+    rssi: (j['rssi'] as num?)?.toInt() ?? -100,
+    secure: j['secure'] as bool? ?? true,
+  );
+}

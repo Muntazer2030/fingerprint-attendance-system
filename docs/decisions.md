@@ -193,6 +193,49 @@ Agreed with owner 2026-10-11. Pay is computed on the PC from the timesheet
 - Known limit: there is no hire date, so a new joiner's days before they
   started read as absences. Lower their absent days for that month.
 
+## D14 — Telegram alerts are sent by the terminal
+Agreed with owner 2026-10-12. The owner chose the terminal over the PC as the
+sender, so alerts keep arriving with the PC off.
+
+- **Bends D1 a little, on purpose.** The terminal now judges one thing:
+  whether a day's *first* IN is past the expected start + grace. It does so
+  only against a roster the PC pushes (names as text + expected start per
+  employee per day, 14 days ahead), computed by the same `ShiftResolver` as
+  the timesheet. Payroll and the timesheet still come only from the PC.
+- **Messages:** each check-in/out (optional), late arrivals, and a daily
+  summary at a chosen minute (late / absent / not checked out / came on a day
+  off). Language follows the terminal's display language.
+- **Never blocks scanning.** Punches are queued; a low-priority task does
+  the log reading and the HTTPS to `api.telegram.org` (cert bundle: Go
+  Daddy root, which is in the common set). Up to 5 attempts with backoff,
+  then the message is dropped and counted. Attendance itself is unaffected.
+- **Storage:** the unused 256 KB `storage` partition, raw sectors with a
+  CRC'd header written last (NVS has no room left after the name bitmaps).
+- **Limits:** a night shift's lateness after midnight is not detected (the
+  first IN is matched against that calendar day's start). With the PC off for
+  more than 14 days, there is no roster: no late alerts, and the summary only
+  lists who came in.
+
+## D15 — Wi-Fi as a fallback to Ethernet
+Agreed with owner 2026-10-13.
+
+- **Ethernet first.** Wi-Fi starts after Ethernet has had no *link and
+  address* for 20 s, and stops once Ethernet has been back for 60 s. Link
+  matters: the static-IP fallback assigns an address even with no cable.
+- **The default route is chosen explicitly** each tick (Wi-Fi's stock route
+  priority would otherwise beat Ethernet whenever both are up).
+- **Credentials come from the app**, set while it reaches the terminal over
+  Ethernet; the terminal can scan for networks for the picker. Stored in the
+  raw `storage` partition (sector 4, see `store.h`), password write-only.
+- **No NVS.** Wi-Fi's own NVS storage and PHY calibration storage are both
+  off; NVS is nearly full with name bitmaps.
+- **ESP32-C3:** TX power is capped at 8.5 dBm. Many C3 boards (SuperMini
+  especially) cannot associate at full power because of their antenna layout.
+- **Cost:** the app image grew to ~1.04 MB; 31% of the 1.5 MB OTA slot is
+  left.
+- On switching, the terminal's address changes; the app's existing relocation
+  (ARP + subnet sweep) finds it again, as long as the PC is on the same network.
+
 ## Open
 - **O3** Exact LCD controller + interface; FPM12 baud, capacity, logic level.
 - **O4** ESP-IDF version: only v6.1-beta1 is provisioned on this machine.

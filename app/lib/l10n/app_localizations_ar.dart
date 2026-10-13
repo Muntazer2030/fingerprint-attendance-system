@@ -968,4 +968,207 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get passwordRemoved => 'تمت إزالة كلمة المرور';
+
+  @override
+  String get tgTitle => 'تنبيهات تيليجرام';
+
+  @override
+  String get tgTileHelp =>
+      'الدخول والخروج والتأخير وملخص يومي، يرسلها جهاز الحضور';
+
+  @override
+  String get tgIntro =>
+      'يرسل جهاز الحضور هذه التنبيهات بنفسه، فتصل حتى والكمبيوتر مغلق. يحكم على التأخير حسب الورديات التي يرسلها هذا التطبيق مع كل مزامنة، لأسبوعين قادمين.';
+
+  @override
+  String get tgActive => 'مفعّل. الجهاز يرسل التنبيهات.';
+
+  @override
+  String get tgNotActive =>
+      'غير مفعّل. حدّد البوت والمحادثة بالأسفل وفعّل التنبيهات.';
+
+  @override
+  String tgCounters(int sent, int failed, int dropped) {
+    return 'أُرسل $sent · محاولات فاشلة $failed · لم تُرسل $dropped';
+  }
+
+  @override
+  String tgLastError(String error) {
+    return 'آخر مشكلة: $error';
+  }
+
+  @override
+  String get tgNoRoster =>
+      'لا يوجد جدول على الجهاز بعد، فلا يمكنه معرفة المتأخرين. سيصله مع أول مزامنة بعد الحفظ.';
+
+  @override
+  String tgRoster(int names, String from, String to) {
+    return 'الجدول على الجهاز: $names اسماً، من $from إلى $to';
+  }
+
+  @override
+  String get tgStepBot => '١. البوت';
+
+  @override
+  String get tgStepBotHelp =>
+      'في تيليجرام افتح ‎@BotFather وأرسل ‎/newbot واتبع الخطوات. سيعطيك رمزاً (token): الصقه هنا.';
+
+  @override
+  String get tgBotToken => 'رمز البوت';
+
+  @override
+  String tgTokenSet(String hint) {
+    return 'يوجد رمز ينتهي بـ …$hint. اتركه فارغاً للإبقاء عليه.';
+  }
+
+  @override
+  String get tgTokenInvalid => 'هذا لا يبدو رمز بوت (123456789:AA…)';
+
+  @override
+  String get tgTokenNeededForFind => 'الصق رمز البوت أولاً';
+
+  @override
+  String get tgCheckToken => 'تحقق من الرمز';
+
+  @override
+  String get tgStepChat => '٢. إلى أين تُرسل';
+
+  @override
+  String get tgStepChatHelp =>
+      'افتح البوت الجديد في تيليجرام وأرسل له ‎/start (أو أضفه إلى مجموعة وأرسل رسالة فيها)، ثم اضغط بحث.';
+
+  @override
+  String get tgChatId => 'معرّف المحادثة';
+
+  @override
+  String get tgFindChat => 'بحث';
+
+  @override
+  String get tgNoChats =>
+      'لا توجد رسائل للبوت بعد. أرسل له ‎/start في تيليجرام ثم اضغط بحث مرة أخرى.';
+
+  @override
+  String get tgStepWhat => '٣. ماذا يُرسل';
+
+  @override
+  String get tgEnabled => 'إرسال التنبيهات';
+
+  @override
+  String get tgEachPunch => 'كل دخول وخروج';
+
+  @override
+  String get tgEachPunchHelp =>
+      'رسالة لكل بصمة. قد تكون كثيرة مع عدد كبير من الموظفين.';
+
+  @override
+  String get tgLate => 'التأخير';
+
+  @override
+  String get tgLateHelp =>
+      'عندما يكون أول دخول في اليوم بعد فترة السماح للوردية.';
+
+  @override
+  String get tgSummary => 'ملخص يومي';
+
+  @override
+  String get tgSummaryHelp => 'من حضر، ومن تأخر، ومن غاب، ومن لم يسجّل الخروج.';
+
+  @override
+  String tgSummaryAt(String time) {
+    return 'الإرسال الساعة $time';
+  }
+
+  @override
+  String get tgSendTest => 'إرسال رسالة تجريبية';
+
+  @override
+  String get tgSendSummary => 'إرسال الملخص الآن';
+
+  @override
+  String get tgQueued => 'أُرسل إلى الجهاز. جارٍ التحقق من الوصول…';
+
+  @override
+  String get wifiTitle => 'واي فاي احتياطي';
+
+  @override
+  String get wifiTileHelp => 'يُستخدم فقط عندما لا يكون كابل الإيثرنت متصلاً';
+
+  @override
+  String get wifiIntro =>
+      'يبقى الإيثرنت هو الاتصال الأساسي. إذا انقطع الكابل لمدة 20 ثانية ينضم الجهاز إلى شبكة الواي فاي هذه، ويعود إلى الكابل بعد أن يعمل مجدداً لمدة دقيقة. اضبطها الآن بينما يستطيع التطبيق الوصول إلى الجهاز.';
+
+  @override
+  String get wifiActiveEth => 'الجهاز متصل عبر الإيثرنت.';
+
+  @override
+  String wifiActiveWifi(String ip) {
+    return 'الجهاز متصل عبر الواي فاي على $ip (لا يوجد إيثرنت).';
+  }
+
+  @override
+  String get wifiActiveNone => 'الجهاز غير متصل.';
+
+  @override
+  String get wifiNotSet =>
+      'لم تُحدد شبكة واي فاي. بدونها، فصل الكابل يعني انقطاع الاتصال.';
+
+  @override
+  String wifiStandby(String ssid) {
+    return 'في الانتظار: سيستخدم \"$ssid\" إذا فُصل الكابل.';
+  }
+
+  @override
+  String wifiConnecting(String ssid) {
+    return 'جارٍ الاتصال بـ \"$ssid\"…';
+  }
+
+  @override
+  String wifiConnected(String ssid, int rssi) {
+    return 'متصل بـ \"$ssid\"، الإشارة $rssi dBm.';
+  }
+
+  @override
+  String wifiFailed(String ssid, String error) {
+    return 'تعذّر الاتصال بـ \"$ssid\": $error. ما زال يحاول.';
+  }
+
+  @override
+  String get wifiNetwork => 'الشبكة';
+
+  @override
+  String get wifiSsid => 'اسم الشبكة (SSID)';
+
+  @override
+  String get wifiScan => 'بحث';
+
+  @override
+  String get wifiScanning => 'الجهاز يبحث عن الشبكات. يستغرق ذلك بضع ثوانٍ.';
+
+  @override
+  String get wifiNoneFound => 'لم يُعثر على شبكات قرب الجهاز.';
+
+  @override
+  String get wifiOpen => 'مفتوحة';
+
+  @override
+  String get wifiPassword => 'كلمة المرور';
+
+  @override
+  String get wifiPasswordKeep => 'أعد كتابة كلمة المرور عند تغيير الشبكة';
+
+  @override
+  String get wifiPasswordHelp =>
+      'اتركها فارغة فقط لشبكة مفتوحة. لا يُعيد الجهاز كلمة المرور أبداً.';
+
+  @override
+  String get wifiPasswordShort => 'كلمة مرور الواي فاي 8 أحرف على الأقل';
+
+  @override
+  String get wifiShowPassword => 'إظهار كلمة المرور';
+
+  @override
+  String get wifiForget => 'نسيان الشبكة';
+
+  @override
+  String get wifiForgotten => 'تم نسيان شبكة الواي فاي';
 }
