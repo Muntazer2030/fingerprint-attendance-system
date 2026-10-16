@@ -411,5 +411,19 @@
   "wifiPasswordShort": "A Wi-Fi password has at least 8 characters",
   "wifiShowPassword": "Show password",
   "wifiForget": "Forget network",
-  "wifiForgotten": "Wi-Fi network forgotten"
+  "wifiForgotten": "Wi-Fi network forgotten",
+  "resetApp": "Reset app",
+  "resetAppHint": "Deletes everything this app keeps on this computer and starts again as if newly installed.",
+  "resetAppTitle": "Reset the app?",
+  "resetAppBody": "This permanently deletes from this computer:\n• every punch, including manual punches and edits\n• shifts, wages, payroll and payment history\n• the terminal's address and token, the app password and all settings\n\nExport any reports you need first.",
+  "resetAppKeeps": "The terminal is not changed. Its employees and fingerprints stay on it, and punches it still holds are copied back when you connect again.",
+  "resetConfirmWord": "RESET",
+  "resetConfirmLabel": "Type {word} to confirm",
+  "@resetConfirmLabel": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  }
 }

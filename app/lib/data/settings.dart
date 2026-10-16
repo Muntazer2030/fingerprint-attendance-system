@@ -212,6 +212,24 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Back to a fresh install: the connection, remembered token, password,
+  /// language, theme, currency and sync position all go. Attendance data is
+  /// in the database, which `AppDatabase.wipe` clears.
+  Future<void> reset() async {
+    final p = await SharedPreferences.getInstance();
+    await p.clear();
+    _host = '';
+    _token = '';
+    _draftToken = '';
+    _locale = const Locale('en');
+    _themeMode = ThemeMode.system;
+    _syncedThroughSeq = 0;
+    _currency = '';
+    _passwordHash = '';
+    _locked = false;
+    notifyListeners();
+  }
+
   /// High-water mark of events durably stored on this PC. Kept here rather
   /// than on the device so that re-reading a range stays possible until the
   /// device's ring wraps.

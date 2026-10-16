@@ -109,7 +109,15 @@ static bool authorized(httpd_req_t *req)
     if (strncmp(hdr, "Bearer ", 7) != 0) {
         return false;
     }
-    return strcmp(hdr + 7, s_token) == 0;
+    if (strcmp(hdr + 7, s_token) != 0) {
+        return false;
+    }
+    /* Unless Wi-Fi is the link in use, this request came over the cable --
+     * proof that the cable works even if the gateway ignores ping. */
+    if (strcmp(net_active_iface(), "wifi") != 0) {
+        net_eth_note_reachable();
+    }
+    return true;
 }
 
 static esp_err_t deny(httpd_req_t *req)

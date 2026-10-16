@@ -51,7 +51,14 @@ class _AppShellState extends State<AppShell> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final settings = AppScope.settingsOf(context);
-    if (_syncStarted || !settings.isConfigured) return;
+    if (!settings.isConfigured) {
+      // After "Reset app" (which stops syncing) the next connection must
+      // start it again, and open on the dashboard rather than Settings.
+      _syncStarted = false;
+      _index = 0;
+      return;
+    }
+    if (_syncStarted) return;
     _syncStarted = true;
 
     // Pull punches into the local database on a timer. The service commits

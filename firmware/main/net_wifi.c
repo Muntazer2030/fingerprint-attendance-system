@@ -62,7 +62,10 @@ static char s_err[48];
 
 /* ------------------------------------------------------------ helpers -- */
 
-static bool eth_usable(void) { return net_eth_link_up() && net_eth_got_ip(); }
+/* Link, address, and if the address is only the static guess, proof that
+ * something answers on it. A terminal stuck on 192.168.137.50 on a network
+ * that is not 192.168.137.x is offline, and Wi-Fi should take over. */
+static bool eth_usable(void) { return net_eth_usable(); }
 
 static void set_err(const char *e)
 {

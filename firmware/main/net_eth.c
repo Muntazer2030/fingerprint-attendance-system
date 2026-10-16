@@ -41,6 +41,16 @@ static uint32_t s_resets;
 static int64_t s_start_us;
 static char s_ip[16] = "0.0.0.0";
 
+/* The static fallback address is a guess: it only works when the cable goes
+ * to a PC sharing its connection on 192.168.137.x. Until the gateway answers
+ * on it, it does not count as being online. */
+static bool s_gw_seen;
+static int64_t s_static_since_us;
+static esp_timer_handle_t s_fallback_timer;
+
+/* Ask DHCP again this long after falling back, while nothing answers. */
+#define DHCP_RETRY_US (60LL * 1000000)
+
 static void on_eth_event(void *arg, esp_event_base_t base, int32_t id, void *data)
 {
     uint8_t mac[6];
@@ -52,6 +62,11 @@ static void on_eth_event(void *arg, esp_event_base_t base, int32_t id, void *dat
         s_link_up = true;
         ESP_LOGI(TAG, "link up, mac %02x:%02x:%02x:%02x:%02x:%02x",
                  mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        /* The fallback is only decided with a cable in, so the clock starts
+         * now -- not at boot, when the cable may not have been there yet. */
+        if (!s_got_ip) {
+            start_dhcp_fallback_timer();
+        }
         break;
     case ETHERNET_EVENT_DISCONNECTED:
         ESP_LOGW(TAG, "link down");
@@ -90,6 +105,11 @@ static void dhcp_fallback_cb(void *arg)
     if (s_got_ip || !s_eth_netif) {
         return;
     }
+    /* No cable, no point: assigning an address here used to make an unplugged
+     * terminal look online. The link-up event re-arms this timer. */
+    if (!s_link_up) {
+        return;
+    }
 
     esp_netif_ip_info_t ip = {0};
     if (esp_netif_str_to_ip4(CONFIG_ATT_NET_STATIC_IP, &ip.ip) != ESP_OK ||
@@ -101,6 +121,8 @@ static void dhcp_fallback_cb(void *arg)
 
     esp_netif_dhcpc_stop(s_eth_netif);
     s_static = true;
+    s_gw_seen = false;
+    s_static_since_us = esp_timer_get_time();
     if (esp_netif_set_ip_info(s_eth_netif, &ip) != ESP_OK) {
         s_static = false;
         ESP_LOGE(TAG, "failed to apply static fallback");
@@ -112,19 +134,44 @@ static void dhcp_fallback_cb(void *arg)
              CONFIG_ATT_NET_DHCP_TIMEOUT_S);
 }
 
+/* (Re)starts the countdown to the static fallback. One timer, re-armed --
+ * this used to create a new timer on every call. */
 static void start_dhcp_fallback_timer(void)
 {
     if (CONFIG_ATT_NET_DHCP_TIMEOUT_S <= 0) {
         return;
     }
-    const esp_timer_create_args_t args = {
-        .callback = dhcp_fallback_cb,
-        .name = "dhcp_fallback",
-    };
-    esp_timer_handle_t t;
-    if (esp_timer_create(&args, &t) == ESP_OK) {
-        esp_timer_start_once(t, (uint64_t)CONFIG_ATT_NET_DHCP_TIMEOUT_S * 1000000ULL);
+    if (!s_fallback_timer) {
+        const esp_timer_create_args_t args = {
+            .callback = dhcp_fallback_cb,
+            .name = "dhcp_fallback",
+        };
+        if (esp_timer_create(&args, &s_fallback_timer) != ESP_OK) {
+            return;
+        }
     }
+    esp_timer_stop(s_fallback_timer);   /* not running is fine */
+    esp_timer_start_once(s_fallback_timer,
+                         (uint64_t)CONFIG_ATT_NET_DHCP_TIMEOUT_S * 1000000ULL);
+}
+
+/* Leaves the static fallback and asks DHCP again. Before this existed the
+ * fallback was permanent until a reboot: a router that was slow at boot, or a
+ * cable plugged in later, left the terminal stuck on 192.168.137.50. */
+static void retry_dhcp(void)
+{
+    if (!s_eth_netif) {
+        return;
+    }
+    s_static = false;
+    s_got_ip = false;
+    s_gw_seen = false;
+    strcpy(s_ip, "0.0.0.0");
+    esp_err_t err = esp_netif_dhcpc_start(s_eth_netif);
+    if (err != ESP_OK && err != ESP_ERR_ESP_NETIF_DHCP_ALREADY_STARTED) {
+        ESP_LOGW(TAG, "dhcp restart failed: %s", esp_err_to_name(err));
+    }
+    start_dhcp_fallback_timer();
 }
 
 /* --- wedge recovery -----------------------------------------------------
@@ -213,10 +260,10 @@ static void recover(void)
         ESP_LOGE(TAG, "restart failed - rebooting");
         esp_restart();
     }
-    s_got_ip = false;
-    s_static = false;
     s_start_us = esp_timer_get_time();
-    start_dhcp_fallback_timer();
+    /* Back to DHCP too: resetting the chip used to keep the static address
+     * with DHCP still switched off. */
+    retry_dhcp();
 }
 
 static void watchdog_task(void *arg)
@@ -233,7 +280,22 @@ static void watchdog_task(void *arg)
         }
 
         if (gateway_reachable()) {
+            s_gw_seen = true;
             strikes = 0;
+            continue;
+        }
+
+        /* On the fallback address with nothing ever answering, there may
+         * simply be no 192.168.137.x network on this cable -- the gateway is
+         * our own guess. Resetting the chip cannot conjure one up (this used
+         * to reset it every ~100 s, forever). Ask DHCP again instead. */
+        if (s_static && !s_gw_seen) {
+            strikes = 0;
+            if (esp_timer_get_time() - s_static_since_us > DHCP_RETRY_US) {
+                ESP_LOGW(TAG, "nothing answers on the fallback address - "
+                              "asking DHCP again");
+                retry_dhcp();
+            }
             continue;
         }
 
@@ -415,6 +477,13 @@ esp_err_t net_eth_start(void)
 }
 
 bool net_eth_got_ip(void) { return s_got_ip; }
+
+void net_eth_note_reachable(void) { s_gw_seen = true; }
+
+bool net_eth_usable(void)
+{
+    return s_link_up && s_got_ip && (!s_static || s_gw_seen);
+}
 esp_netif_t *net_eth_netif(void) { return s_eth_netif; }
 bool net_eth_link_up(void) { return s_link_up; }
 const char *net_eth_ip(void) { return s_ip; }

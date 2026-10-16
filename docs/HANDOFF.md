@@ -44,6 +44,8 @@ tests, a full end-to-end run of the real Windows build against
 | Wi-Fi fallback when Ethernet is unplugged (D15), set from Device -> Wi-Fi | app + mock + widget tests 2026-10-13; firmware compiles, **not yet run on hardware** |
 | Telegram alerts sent by the terminal (D14): per punch, late, daily summary | app side + mock verified 2026-10-12; firmware compiles, **not yet run on hardware** |
 | App password (lock on open, lock button, set/change/remove in Settings) | works; tested, checked in the web build (2026-10-12) |
+| Reset app (Settings, bottom): wipes every DB table + all preferences, stops sync; terminal untouched. Needs "RESET"/"حذف" typed + the app password if set | widget + unit tested 2026-10-16 (`app_reset_test.dart`) |
+| App icon (fingerprint on indigo) + window/product name "Attendance" | `app_icon.ico` built by a Chrome-render script: DIB entries < 256 px (rc.exe rejects small PNG entries), PNG at 256 |
 | Payroll: wages, overtime pay, late/absence cuts, bonuses/advances, mark paid (frozen), .xlsx | works; unit + widget tested, checked in the web build (2026-10-11). Policy in decisions.md D13 |
 
 ### Fixed on 2026-09-30 (keep these fixed)
@@ -161,9 +163,13 @@ tools/              api.ps1, screenshot.py, simulate_screen.py
   reach it (Timesheet -> Shifts crashed). `test/app_scope_test.dart` guards it.
 - **The `storage` partition has a sector map** in `firmware/main/store.h`.
   Add new records there; never write sectors another module owns.
-- **"Ethernet is up" means link AND address** (`net_wifi.c` eth_usable).
-  `net_eth_got_ip()` alone is true with no cable once the static fallback
-  fires. Use `net_any_got_ip()` / `net_active_ip()` for "is it online".
+- **"Ethernet is up" means `net_eth_usable()`**: link, an address, and --
+  if that address is only the static fallback (192.168.137.50) -- proof that
+  something answers on it (a gateway ping reply, or an authenticated API
+  request over the cable). Use `net_any_got_ip()` / `net_active_ip()` for
+  "is it online". Until 2026-10-13 the fallback was permanent (DHCP never
+  retried, not even after a chip reset) and the watchdog reset the chip every
+  ~100 s pinging a gateway that did not exist; both fixed in `net_eth.c`.
 - **The roster's binary layout is a wire contract** between
   `roster_push.dart` and `notify.c` (documented in protocol.md and
   notify.h). `test/roster_push_test.dart` parses it the way the C does.

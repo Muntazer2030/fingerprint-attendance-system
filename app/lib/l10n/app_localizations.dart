@@ -2257,6 +2257,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wi-Fi network forgotten'**
   String get wifiForgotten;
+
+  /// No description provided for @resetApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset app'**
+  String get resetApp;
+
+  /// No description provided for @resetAppHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Deletes everything this app keeps on this computer and starts again as if newly installed.'**
+  String get resetAppHint;
+
+  /// No description provided for @resetAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset the app?'**
+  String get resetAppTitle;
+
+  /// No description provided for @resetAppBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes from this computer:\n• every punch, including manual punches and edits\n• shifts, wages, payroll and payment history\n• the terminal\'s address and token, the app password and all settings\n\nExport any reports you need first.'**
+  String get resetAppBody;
+
+  /// No description provided for @resetAppKeeps.
+  ///
+  /// In en, this message translates to:
+  /// **'The terminal is not changed. Its employees and fingerprints stay on it, and punches it still holds are copied back when you connect again.'**
+  String get resetAppKeeps;
+
+  /// No description provided for @resetConfirmWord.
+  ///
+  /// In en, this message translates to:
+  /// **'RESET'**
+  String get resetConfirmWord;
+
+  /// No description provided for @resetConfirmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type {word} to confirm'**
+  String resetConfirmLabel(String word);
 }
 
 class _AppLocalizationsDelegate

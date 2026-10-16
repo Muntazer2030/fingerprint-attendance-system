@@ -259,6 +259,14 @@ class AppDatabase extends _$AppDatabase {
     },
   );
 
+  /// Empties every table in one transaction, for "Reset app". The schema
+  /// stays, so the app carries on with a database like a fresh install's.
+  Future<void> wipe() => transaction(() async {
+    for (final t in allTables) {
+      await delete(t).go();
+    }
+  });
+
   // --- punches -----------------------------------------------------------
 
   /// Manual punches are numbered from here up, so they can never collide with
@@ -544,9 +552,8 @@ class AppDatabase extends _$AppDatabase {
   Future<void> deletePayAdjustment(int id) =>
       (delete(payAdjustments)..where((t) => t.id.equals(id))).go();
 
-  Future<List<PayEditRow>> payEditsFor(int monthKey) => (select(
-    payEdits,
-  )..where((t) => t.monthKey.equals(monthKey))).get();
+  Future<List<PayEditRow>> payEditsFor(int monthKey) =>
+      (select(payEdits)..where((t) => t.monthKey.equals(monthKey))).get();
 
   Future<void> setPayEdit(PayEditsCompanion row) =>
       into(payEdits).insertOnConflictUpdate(row);

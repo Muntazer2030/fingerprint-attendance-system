@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../data/api_client.dart';
+import '../data/app_reset.dart';
 import '../data/device_scanner.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
 import 'lock_page.dart';
+import 'reset_app_dialog.dart';
 import 'theme.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -135,6 +137,20 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _resetApp() async {
+    // Looked up before the await: a reset sends the app back to the connect
+    // screen, and this page is gone by the time it finishes.
+    final settings = AppScope.settingsOf(context);
+    final db = AppScope.dbOf(context);
+    final sync = AppScope.syncOf(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => ResetAppDialog(settings: settings),
+    );
+    if (ok != true) return;
+    await resetApp(settings: settings, db: db, sync: sync);
   }
 
   @override
@@ -305,6 +321,28 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ],
                   ],
+                ),
+                const Divider(height: 56),
+                Text(
+                  l.resetApp,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(color: AppTheme.danger),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l.resetAppHint,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _resetApp,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.danger,
+                    side: const BorderSide(color: AppTheme.danger),
+                  ),
+                  icon: const Icon(Icons.delete_forever_outlined),
+                  label: Text(l.resetApp),
                 ),
               ],
             ],

@@ -12,6 +12,15 @@ esp_err_t net_eth_start(void);
  * which applies even with no cable. Pair with net_eth_link_up(). */
 bool net_eth_got_ip(void);
 
+/* Actually online over the cable: link, an address, and -- when that address
+ * is only the static fallback -- a gateway that has answered on it. */
+bool net_eth_usable(void);
+
+/* Something reached us over the cable (an authenticated API request). Counts
+ * like a gateway reply: a PC wired straight to the terminal on the fallback
+ * address often blocks ping, but its app still talks to us. */
+void net_eth_note_reachable(void);
+
 /* The Ethernet interface, for choosing the default route. NULL if Ethernet
  * failed to start. */
 esp_netif_t *net_eth_netif(void);

@@ -31,8 +31,9 @@ static const char *TAG = "attend";
 #define TONE_CH     LEDC_CHANNEL_0
 #define TONE_TIMER  LEDC_TIMER_0
 #define RESULT_HOLD_MS 2500
-/* At a 120 ms poll that is ~0.6 s of steady level before a press counts. */
-#define TOUCH_DEBOUNCE_SAMPLES 5
+/* After a press is accepted, ignore further edges for this long: one finger
+ * on the pad must not count as two presses. */
+#define TOUCH_LOCKOUT_US (300 * 1000)
 /* An operator who walks away must not leave the terminal unable to record
  * attendance, so enrolment is bounded. */
 #define ENROLL_TIMEOUT_MS  45000
@@ -413,38 +414,75 @@ static void wake(void)
 
 /* --------------------------------------------------------------- touch -- */
 
+/* A press is caught by an edge interrupt, not by polling. The loop below runs
+ * every 120 ms *plus* however long a fingerprint image and a screen refresh
+ * take, and the old code wanted five matching samples in a row -- so a press
+ * had to be held for over half a second, often two, and a normal tap fell
+ * between samples and was lost. The interrupt sees a tap of any length; the
+ * task just collects it. */
+static volatile bool s_touch_pending;
+static volatile int64_t s_touch_last_us;
+
+static void IRAM_ATTR touch_isr(void *arg)
+{
+    int64_t now = esp_timer_get_time();
+    if (now - s_touch_last_us < TOUCH_LOCKOUT_US) {
+        return;
+    }
+    s_touch_last_us = now;
+    s_touch_pending = true;
+}
+
+static void touch_init(void)
+{
+    if (PIN_TOUCH < 0) {
+        return;
+    }
+#if CONFIG_ATT_TOUCH_ACTIVE_HIGH
+    const bool active_high = true;
+#else
+    const bool active_high = false;
+#endif
+    /* Pull towards "not touched", so an unwired or unpowered TTP223 reads as
+     * idle instead of floating into phantom presses. Input-only pins (34-39 on
+     * the WROOM) have no internal pulls; fit an external 10 k there. */
+    bool can_pull = GPIO_IS_VALID_OUTPUT_GPIO(PIN_TOUCH);
+    gpio_config_t io = {
+        .pin_bit_mask = PIN_MASK(PIN_TOUCH),
+        .mode = GPIO_MODE_INPUT,
+        .pull_down_en = (can_pull && active_high) ? GPIO_PULLDOWN_ENABLE
+                                                  : GPIO_PULLDOWN_DISABLE,
+        .pull_up_en = (can_pull && !active_high) ? GPIO_PULLUP_ENABLE
+                                                 : GPIO_PULLUP_DISABLE,
+        .intr_type = active_high ? GPIO_INTR_POSEDGE : GPIO_INTR_NEGEDGE,
+    };
+    gpio_config(&io);
+
+    /* Usually already installed by the Ethernet driver; IDF logs that case as
+     * an error even though it is fine, so keep it out of the boot log. */
+    esp_log_level_set("gpio", ESP_LOG_NONE);
+    esp_err_t err = gpio_install_isr_service(0);
+    esp_log_level_set("gpio", ESP_LOG_INFO);
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "touch: isr service failed: %s", esp_err_to_name(err));
+        return;
+    }
+    gpio_isr_handler_add(PIN_TOUCH, touch_isr, NULL);
+    ESP_LOGI(TAG, "touch on GPIO%d, active %s, pull %s, level now %d",
+             PIN_TOUCH, active_high ? "high" : "low",
+             can_pull ? (active_high ? "down" : "up") : "none (input-only pin)",
+             gpio_get_level(PIN_TOUCH));
+}
+
 static void poll_touch(void)
 {
-    /* GPIO35 is input-only and has no internal pull, so an unconnected TTP223
-     * leaves the line floating and it reads as noise -- which showed up as the
-     * direction override flipping several times a second on its own. Require
-     * the level to hold steady across several polls before believing it, and
-     * let an operator switch the input off entirely. */
-    static bool stable;      /* last accepted level      */
-    static bool candidate;   /* level we are waiting on  */
-    static int  agree;       /* consecutive matching samples */
-
+    if (!s_touch_pending) {
+        return;
+    }
+    s_touch_pending = false;
+    /* Switched off in the app (button not fitted): presses are dropped. */
     if (!cfg()->use_touch_button) {
         return;
-    }
-
-    bool now = gpio_get_level(PIN_TOUCH) != 0;
-
-    if (now != candidate) {
-        candidate = now;
-        agree = 0;
-        return;
-    }
-    if (++agree < TOUCH_DEBOUNCE_SAMPLES) {
-        return;               /* not settled yet */
-    }
-    if (candidate == stable) {
-        return;               /* settled on what we already had */
-    }
-    stable = candidate;
-
-    if (!stable) {
-        return;               /* act on press, not release */
     }
 
     wake();
@@ -674,12 +712,7 @@ static void enroll_step(void)
 static void attend_task(void *arg)
 {
     tone_init();
-
-    gpio_config_t touch = {
-        .pin_bit_mask = PIN_MASK(PIN_TOUCH),
-        .mode = GPIO_MODE_INPUT,
-    };
-    gpio_config(&touch);
+    touch_init();
 
     wake();
 

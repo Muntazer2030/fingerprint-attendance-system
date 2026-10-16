@@ -60,6 +60,21 @@ class SyncService extends ChangeNotifier {
     pull();
   }
 
+  /// Stops syncing and forgets this session's status. Waits out a round in
+  /// progress, so nothing it pulled can land in a database being wiped.
+  Future<void> stop() async {
+    _timer?.cancel();
+    _timer = null;
+    await _inflight;
+    _lastSync = null;
+    _lastError = null;
+    _lastPulled = 0;
+    _rosterConfirmed = null;
+    _rosterCheckedAt = null;
+    _rosterError = null;
+    _changed();
+  }
+
   @override
   void dispose() {
     _timer?.cancel();

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Attendance System — User Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 18mm 16mm;
+    @bottom-center { content: counter(page); font: 9pt "Segoe UI", Arial, sans-serif; color: #888; }
+  }
+  @page :first { @bottom-center { content: none; } }
+  :root { --accent: #4f46e5; --muted: #5b6170; --line: #e2e5ec; --tip: #eef2ff; --warn: #fff6e0; }
+  * { box-sizing: border-box; }
+  body { font: 10.5pt/1.55 "Segoe UI", Tahoma, Arial, sans-serif; color: #1d2330; margin: 0; }
+  h1 { font-size: 20pt; color: var(--accent); margin: 0 0 4mm; padding-bottom: 2mm; border-bottom: 2px solid var(--accent); }
+  h2 { font-size: 14pt; margin: 7mm 0 2mm; color: #1d2330; break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 4mm 0 1.5mm; color: var(--accent); break-after: avoid; }
+  p { margin: 0 0 2.2mm; }
+  ul, ol { margin: 0 0 2.5mm; padding-inline-start: 6mm; }
+  li { margin-bottom: 1mm; }
+  b, strong { color: #111; }
+  .ui { font-weight: 600; color: #2b2f8f; white-space: nowrap; }
+  figure { margin: 3mm 0 4mm; break-inside: avoid; text-align: center; }
+  figure img { max-width: 100%; max-height: 95mm; border: 1px solid var(--line); border-radius: 6px; }
+  figcaption { font-size: 9pt; color: var(--muted); margin-top: 1.2mm; }
+  .tip, .warn { padding: 2.5mm 3.5mm; border-radius: 6px; margin: 2.5mm 0 3.5mm; break-inside: avoid; }
+  .tip { background: var(--tip); border-inline-start: 4px solid var(--accent); }
+  .warn { background: var(--warn); border-inline-start: 4px solid #f59e0b; }
+  table { border-collapse: collapse; width: 100%; margin: 2mm 0 4mm; font-size: 9.8pt; break-inside: auto; }
+  th, td { border: 1px solid var(--line); padding: 1.6mm 2.4mm; text-align: start; vertical-align: top; }
+  th { background: #f4f5f8; }
+  tr { break-inside: avoid; }
+  .part { break-before: page; }
+  .cover { height: 250mm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+  .cover .logo { width: 26mm; height: 26mm; border-radius: 7mm; background: var(--accent); margin: 0 auto 8mm; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15mm; }
+  .cover h1 { border: none; font-size: 28pt; margin-bottom: 2mm; }
+  .cover .ar { font-size: 24pt; color: var(--accent); font-weight: 700; margin-bottom: 10mm; }
+  .cover p { color: var(--muted); font-size: 12pt; }
+  .toc { columns: 2; column-gap: 10mm; font-size: 10pt; }
+  .toc ol { margin: 0; }
+  code { font-family: Consolas, monospace; font-size: 9.5pt; background: #f4f5f8; padding: 0 1.2mm; border-radius: 3px; }
+  [dir="rtl"] body, [dir="rtl"] { font-family: "Segoe UI", Tahoma, Arial, sans-serif; }
+  [dir="rtl"] p, [dir="rtl"] li, [dir="rtl"] td { line-height: 1.75; }
+  [dir="rtl"] code, [dir="rtl"] .ltr { direction: ltr; unicode-bidi: isolate; }
+  .ui-ar { font-weight: 600; color: #2b2f8f; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="logo"><svg width="15mm" height="15mm" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M12 11c0 3.5-1 6.5-2.5 9"/><path d="M8.5 7.6A4.5 4.5 0 0 1 16.5 10.5c0 3-.6 6-1.8 8.6"/><path d="M5.7 9.2A7 7 0 0 1 19 10.5c0 1.6-.1 3.1-.4 4.6"/><path d="M7.5 18.5c.8-1.9 1.2-4.2 1.3-7.2a3.2 3.2 0 0 1 6.4.2c0 .7 0 1.4-.1 2"/><path d="M4.6 15.5c.4-1.5.6-3.2.6-5"/></svg></div>
+  <h1>Attendance System</h1>
+  <p style="font-size:16pt;color:#1d2330"><b>User Guide</b></p>
+  <p>Fingerprint terminal + Windows admin app</p>
+  <p style="margin-top:14mm;font-size:10pt">October 2026</p>
+</section>
+<!-- ============================== ENGLISH ============================== -->
+<section class="part" lang="en">
+<h1>User Guide</h1>
+
+<div class="toc">
+<ol>
+  <li>How the system works</li>
+  <li>Installing and first start</li>
+  <li>The app password</li>
+  <li>The main window</li>
+  <li>Dashboard</li>
+  <li>Employees and fingerprints</li>
+  <li>Events (punches)</li>
+  <li>Shifts</li>
+  <li>Timesheet</li>
+  <li>Payroll</li>
+  <li>Terminal settings (Device)</li>
+  <li>Wi-Fi fallback</li>
+  <li>Telegram alerts</li>
+  <li>Settings</li>
+  <li>Daily and monthly routine</li>
+  <li>Troubleshooting</li>
+</ol>
+</div>
+
+<h2>1. How the system works</h2>
+<p>The system has two parts:</p>
+<ul>
+  <li><b>The terminal</b> on the wall: staff scan a finger to check in or out. It shows the employee's name and the time, and stores every punch in its own memory (about 40,000 punches). It keeps working with the PC switched off.</li>
+  <li><b>The admin app</b> on the Windows PC: it copies the punches from the terminal (every 20 seconds while it is open), and is where you manage employees, shifts, the monthly timesheet and salaries.</li>
+</ul>
+<p>The PC is the permanent record. After a punch is safely saved on the PC, the terminal is free to reuse that space. Employee names, shifts, wages and reports exist only on the PC.</p>
+<div class="tip">You do not need to keep the app open all day. The terminal stores punches until the app next connects, then the app catches up on its own.</div>
+
+<h2>2. Installing and first start</h2>
+<h3>Installing</h3>
+<p>Copy the whole <code>Release</code> folder to the PC (for example to <code>C:\Attendance</code>) and start <code>attendance_admin.exe</code>. Create a desktop shortcut to it for daily use. Always copy the whole folder, not only the .exe file.</p>
+<h3>Connecting to the terminal</h3>
+<p>On first start the app searches the network for the terminal by itself. When it finds it, it asks for the <b>device token</b>, a 32-character code that protects the terminal. The token is printed in the terminal's start-up log, on the line that begins <code>api: listening</code>.</p>
+<p>If the search does not find the terminal, click <span class="ui">Enter the address manually</span> and type the IP address shown at the top of the terminal's screen, then the token, then <span class="ui">Connect</span>.</p>
+<figure><img src="img/en/settings-password.png"><figcaption>Settings: the terminal's address and token, with the app password below.</figcaption></figure>
+<p>The address and token are saved. From then on the app opens straight into the main window. If the terminal later gets a different address from the router, the app finds it again automatically.</p>
+
+<h2>3. The app password</h2>
+<p>To stop other people at the computer opening the app, set a password in <span class="ui">Settings → App password → Set password</span> (at least 4 characters, typed twice). From then on the app asks for it every time it opens.</p>
+<figure><img src="img/en/settings-password.png"><figcaption>The App password section in Settings.</figcaption></figure>
+<ul>
+  <li><b>Lock now:</b> the padlock next to "Attendance" at the top of the sidebar locks the app immediately, for example when you leave the desk.</li>
+  <li><b>Change or remove:</b> Settings → <span class="ui">Change password</span> or <span class="ui">Remove password</span>. Both ask for the current password first.</li>
+  <li>While the app is locked, punches are still copied from the terminal in the background.</li>
+</ul>
+<figure><img src="img/en/lock.png" style="max-height:60mm"><figcaption>The lock screen.</figcaption></figure>
+<div class="warn"><b>Forgotten password:</b> close the app, open the file <code>%APPDATA%\com.store\attendance_admin\shared_preferences.json</code> in Notepad, delete only the line containing <code>flutter.app_password</code>, save, and start the app. Do not delete anything else in that file: it holds the terminal's address and token.</div>
+
+<h2>4. The main window</h2>
+<p>The sidebar on the left opens each page: <b>Dashboard, Employees, Events, Timesheet, Payroll, Device</b> and <b>Settings</b>. Its bottom corner shows the connection:</p>
+<table>
+  <tr><th>Shows</th><th>Meaning</th></tr>
+  <tr><td><span class="ui">Connected</span></td><td>Everything is fine. "Last sync" is the time punches were last copied.</td></tr>
+  <tr><td><span class="ui">Syncing</span></td><td>Copying punches right now.</td></tr>
+  <tr><td><span class="ui">Looking for the device…</span></td><td>The terminal moved to a new address; the app is finding it.</td></tr>
+  <tr><td><span class="ui">Not connected</span></td><td>The terminal cannot be reached (off, cable, network). Use the retry button. Punches are safe on the terminal meanwhile.</td></tr>
+  <tr><td><span class="ui">Wrong token</span></td><td>The terminal rejected the token. Open Settings and enter it again.</td></tr>
+</table>
+
+<h2>5. Dashboard</h2>
+<p>The first page gives a live view: how many staff are at work right now, how many punches the terminal holds, how many are still waiting to be copied, the terminal's free memory, and the latest punches with names and times.</p>
+<figure><img src="img/en/dashboard.png"><figcaption>Dashboard: all three staff at work, every punch copied to the PC.</figcaption></figure>
+
+<h2>6. Employees and fingerprints</h2>
+<figure><img src="img/en/employees.png"><figcaption>The employee list.</figcaption></figure>
+<h3>Adding an employee</h3>
+<ol>
+  <li>Click <span class="ui">Add employee</span> (bottom right).</li>
+  <li>The <b>Employee ID</b> is filled in for you (1 to 65535). It cannot be changed later.</li>
+  <li>Type the <b>name</b> (Arabic or English) and, if you like, a <b>job title</b>. Click <span class="ui">Add</span>.</li>
+</ol>
+<p>The name is shown on the terminal's screen when the person scans. The terminal must be reachable to add someone.</p>
+<h3>Enrolling fingers</h3>
+<ol>
+  <li>Click <span class="ui">Enrol finger</span> on the employee's row.</li>
+  <li>Follow the steps on screen and on the terminal: <i>Place finger on the sensor → Lift your finger → Place the same finger again</i>.</li>
+  <li>"Enrolled successfully" means the finger is saved. If it says it failed, simply try again.</li>
+</ol>
+<div class="tip">Enrol <b>two or three fingers</b> per person (for example both index fingers). Wet, dry or cut fingers fail sometimes; a second finger avoids a missed punch. The sensor holds about 240 fingers in total.</div>
+<h3>Editing, removing and restoring</h3>
+<ul>
+  <li><b>Edit</b> (pencil): change the name or job title. The terminal's display is updated.</li>
+  <li><b>Delete</b> (bin): removes the person and their fingerprints from the terminal. <b>Their attendance history stays</b> in every past report. They move to <span class="ui">Former employees</span>, where <span class="ui">Restore</span> puts them back on the terminal (enrol their fingers again).</li>
+  <li><span class="ui">Not on the terminal</span> with a <span class="ui">Send to terminal</span> button means the PC knows the person but the terminal does not (for example after the terminal was cleared). Click it, then enrol their fingers.</li>
+  <li>A growing <b>failed reads</b> count means a finger is getting hard to read: enrol another finger.</li>
+</ul>
+
+<h2>7. Events (punches)</h2>
+<p>Every check-in and check-out, newest first, grouped by day. Filter by employee or by date at the top.</p>
+<figure><img src="img/en/events.png"><figcaption>Events, grouped by day.</figcaption></figure>
+<h3>Adding a punch by hand</h3>
+<p>When a finger will not read, a manager can enter the punch: <span class="ui">Add punch</span> → choose the employee, In or Out, the date and time, and a <b>reason</b> (required). Manual punches are marked in every report and recorded in the audit log.</p>
+<figure><img src="img/en/add-punch.png"><figcaption>Adding a manual punch. The reason is required.</figcaption></figure>
+<h3>Correcting a time</h3>
+<p>Click a punch and choose <span class="ui">Correct the time</span>. Enter the right time and a reason. The original recorded time is never deleted: the correction is used in reports, and <span class="ui">Remove correction</span> brings the original back. Manual punches entered by mistake can be deleted; scanned punches cannot (they are evidence) but can be corrected.</p>
+<div class="warn"><b>"Time unverified"</b> means the terminal had lost power and could not yet confirm its clock when the punch was made. Check those times and correct them if they are wrong. The app sets the terminal's clock automatically when it connects.</div>
+
+<h2>8. Shifts</h2>
+<p>Shifts decide what counts as late, absent, overtime and a day off. Open them from <span class="ui">Timesheet → sliders icon (Shifts)</span>.</p>
+<figure><img src="img/en/shifts.png" style="max-height:55mm"><figcaption>The default "Store hours" shift.</figcaption></figure>
+<figure><img src="img/en/edit-shift.png"><figcaption>Editing a shift.</figcaption></figure>
+<ul>
+  <li><b>Fixed hours:</b> a start and end time (e.g. 09:00–17:00). Lateness and early leave are measured. An end before the start is a <b>night shift</b> that ends the next day.</li>
+  <li><b>Flexible:</b> only the hours per day count. Nobody can be late.</li>
+  <li><b>Break:</b> unpaid minutes subtracted from the shift length.</li>
+  <li><b>Late grace / Early leave grace:</b> arriving within the grace is not late at all. After it, the <i>whole</i> delay counts (arriving 09:25 with 10 min grace = 25 min late).</li>
+  <li><b>Working days:</b> unselected days are the weekend (works for Fri/Sat or Sat/Sun).</li>
+  <li><b>Default:</b> the shift used for everyone without their own. Exactly one shift is the default.</li>
+  <li><b>Assign to</b> (people icon): choose who works this shift. Changes apply <b>from today on</b>; past months are not recalculated.</li>
+</ul>
+
+<h2>9. Timesheet</h2>
+<p>The month's attendance, calculated on the PC from the stored punches. Use the arrows at the top right to change month.</p>
+<figure><img src="img/en/timesheet.png"><figcaption>Timesheet summary for October.</figcaption></figure>
+<p>Click an employee to see each day:</p>
+<figure><img src="img/en/timesheet-days.png"><figcaption>One employee's days. The 7th is "Incomplete": he forgot to check out.</figcaption></figure>
+<table>
+  <tr><th>Status</th><th>Meaning</th></tr>
+  <tr><td>Present</td><td>Worked a scheduled day.</td></tr>
+  <tr><td>Absent</td><td>Scheduled, no punch at all.</td></tr>
+  <tr><td>Incomplete</td><td>Punches do not pair up, usually a missing check-out. <b>Needs review.</b></td></tr>
+  <tr><td>Day off</td><td>Not scheduled. Any time worked counts as day-off work.</td></tr>
+  <tr><td>Upcoming</td><td>A scheduled day that has not happened yet.</td></tr>
+  <tr><td>At work</td><td>Today, checked in and not yet out.</td></tr>
+</table>
+<p>The orange warning and the "Needs review" count point at days with missing punches or unverified times. Fix them on the Events page (add the missing punch or correct the time) before using the figures for pay.</p>
+<p><b>Export to Excel</b> (download icon) saves <code>timesheet-YYYY-MM.xlsx</code> in your <b>Documents</b> folder: a summary sheet and a daily detail sheet. When the app is in Arabic, the file is in Arabic and right-to-left. A file with the same name is replaced.</p>
+
+<h2>10. Payroll</h2>
+<p>Salaries for the month, built on the timesheet.</p>
+<figure><img src="img/en/payroll.png"><figcaption>Payroll for October: totals and one row per employee.</figcaption></figure>
+<h3>How pay is calculated</h3>
+<ul>
+  <li><b>Day wage</b> = monthly salary ÷ 30 (every month). <b>Hourly rate</b> = day wage ÷ the employee's usual shift hours.</li>
+  <li><b>Overtime</b> on a working day is paid at <b>×1.5</b> the hourly rate; <b>any work on a day off</b> at <b>×2</b>.</li>
+  <li><b>Late arrival and early leave</b> are cut per minute at <b>×1</b> the hourly rate (the shift's grace still applies).</li>
+  <li>Each <b>absence</b> costs one day wage (never more than the salary). A finished month with no attendance at all pays nothing.</li>
+  <li>All of these can be changed in <span class="ui">Pay rules</span> (sliders icon): the multipliers (0 turns a cut off), whether absences are cut, ignoring short overtime (e.g. under 15 minutes a day), and the <b>currency</b> label (IQD in these examples).</li>
+</ul>
+<figure><img src="img/en/pay-rules.png"><figcaption>Pay rules.</figcaption></figure>
+<h3>Setting a wage</h3>
+<p>Click an employee, then <span class="ui">Set wage</span>. Choose <b>Monthly salary</b>, <b>Per day</b> or <b>Per hour</b> and enter the amount. A wage applies <b>from the month shown onward</b>; earlier months keep the wage they had, so a raise never changes past months.</p>
+<figure><img src="img/en/set-wage.png"><figcaption>Setting a monthly salary of 750,000 IQD.</figcaption></figure><figure><img src="img/en/payslip.png"><figcaption>The payslip after saving: a late arrival and an absence are cut.</figcaption></figure>
+<ul>
+  <li><b>Per day:</b> paid for each scheduled day attended; absent days are simply unpaid.</li>
+  <li><b>Per hour:</b> paid for the minutes worked; lateness and absence are not cut again (that time was already unpaid).</li>
+</ul>
+<h3>The payslip</h3>
+<figure><img src="img/en/payslip-advance.png"><figcaption>A payslip: base pay, overtime, late cut, an advance, and the net pay.</figcaption></figure>
+<p><b>Changing a figure:</b> click the pencil on Overtime, Work on days off, Late arrivals, Early leave or Absences to replace the clock's figure (for example lower absent days to 0 to excuse sick leave). The line is marked <span class="ui">Edited</span> and still shows the clock's original figure. <span class="ui">Use clock figure</span> undoes it.</p>
+<figure><img src="img/en/payslip-edited.png"><figcaption>An edited figure: Ali's one absence excused as sick leave (0 days paid, 1 on the clock).</figcaption></figure>
+<p><b>Bonuses, deductions and advances:</b> <span class="ui">Add</span> under the payslip, choose the type, amount and a note (required). Remove one with its ✕.</p>
+<figure><img src="img/en/adjustment.png"><figcaption>Adding a bonus.</figcaption></figure>
+<h3>Paying the month</h3>
+<p>When salaries are handed out, click <span class="ui">Mark month as paid</span>. The month's figures are <b>frozen</b>: later corrections, wage or rule changes do not change what was paid. The app warns you if the month is not over, if days need review, or if someone has no wage. <span class="ui">Reopen</span> unfreezes a paid month (it is then recalculated from current data).</p>
+<p>The download icon exports <code>payroll-YYYY-MM.xlsx</code> to Documents: every payslip line per employee with totals, plus a sheet of bonuses, deductions and advances.</p>
+<div class="tip"><b>New employees:</b> the app does not know a start date, so days before someone joined count as absences. For their first month, lower their absent days with the pencil.</div>
+
+<h2>11. Terminal settings (Device)</h2>
+<p>Everything here is stored on the terminal. Change what you need, then click <span class="ui">Apply</span>.</p>
+<figure><img src="img/en/device.png"><figcaption>Terminal settings.</figcaption></figure>
+<ul>
+  <li><b>Each scan records:</b> <i>Check in</i> or <i>Check out</i> records that direction for everyone, and the screen says which (switch at closing time, or use the touch button on the terminal). <i>Alternate</i> flips each person between in and out.</li>
+  <li><b>Display language:</b> English or Arabic on the terminal. After changing it, click <span class="ui">Send text to device</span>: the terminal has no Arabic font, so the app draws the text and uploads it.</li>
+  <li><b>Clock format</b> (24-hour or 12-hour), <b>Show seconds</b>, <b>Time offset from UTC</b> (the app keeps this in step with the PC automatically).</li>
+  <li><b>Brightness</b>, <b>Dim screen after</b> and <b>Blank screen after</b>. Keep dimming on: an always-bright screen burns in over time.</li>
+  <li><b>Buzzer</b>, <b>Touch button connected</b>, <b>Sensor wake wire connected</b> (turn these off only if those parts are not wired).</li>
+  <li><b>Ignore repeat scans within:</b> a second scan by the same person inside this time is ignored (default 1 minute).</li>
+  <li><b>Clear the device:</b> erase the log, the fingerprints, the settings, or everything. You must type <code>CLEAR</code>. Punches are copied to the PC first, so clearing the log loses nothing already synced.</li>
+</ul>
+
+<h2>12. Wi-Fi fallback</h2>
+<p><span class="ui">Device → Wi-Fi fallback</span>. Ethernet stays the main connection. If the cable has no working connection for 20 seconds, the terminal joins this Wi-Fi network instead, and returns to the cable once it has worked again for a minute.</p>
+<ol>
+  <li>Set it while the app can reach the terminal (normally over the cable).</li>
+  <li>Click <span class="ui">Scan</span>: the terminal lists the networks it can hear, strongest first. Pick yours.</li>
+  <li>Type the password (empty only for an open network; otherwise at least 8 characters) and click <span class="ui">Save</span>.</li>
+</ol>
+<figure><img src="img/en/wifi.png"><figcaption>Picking the network from the terminal's scan.</figcaption></figure><p>The page shows whether the terminal is on Ethernet or Wi-Fi and the signal strength. <span class="ui">Forget network</span> removes it. When the terminal switches, its address changes; the app finds it again by itself if the PC is on the same network.</p>
+
+<h2>13. Telegram alerts</h2>
+<p><span class="ui">Device → Telegram alerts</span>. The <b>terminal</b> sends these itself, so they arrive even with the PC switched off.</p>
+<figure><img src="img/en/telegram.png"><figcaption>Setting up the bot and chat.</figcaption></figure>
+<ol>
+  <li>In Telegram, open <b>@BotFather</b>, send <code>/newbot</code> and follow the steps. Copy the token it gives you, paste it into <span class="ui">Bot token</span> and click <span class="ui">Check token</span>.</li>
+  <li>Open your new bot in Telegram and send it <code>/start</code> (or add it to a group and write a message there). Click <span class="ui">Find</span> and pick the chat.</li>
+  <li>Choose what to send, switch on <span class="ui">Send alerts</span>, click <span class="ui">Save</span>, then <span class="ui">Send test message</span>.</li>
+</ol>
+<figure><img src="img/en/telegram-what.png"><figcaption>What to send.</figcaption></figure>
+<ul>
+  <li><b>Every check-in and check-out:</b> 🟢 <i>Sara — IN 08:57</i>, 🔴 <i>Sara — OUT 17:05</i>.</li>
+  <li><b>Late arrivals:</b> 🟠 <i>Omar — IN 09:40 · 40 min late</i>, when the first check-in of the day is past the grace.</li>
+  <li><b>Daily summary</b> at the time you choose: present, late, absent, not checked out, and who came on a day off.</li>
+</ul>
+<p>Messages use the terminal's display language. The app sends the terminal the names and the next 14 days of shifts on every sync, so late alerts keep working for two weeks with the PC off. The page shows how many messages were sent and the last problem, if any.</p>
+
+<h2>14. Settings</h2>
+<ul>
+  <li><b>Device address / Device token / Connect / Find device:</b> change or re-find the terminal.</li>
+  <li><b>Language:</b> English or العربية for the whole app (Arabic is right-to-left).</li>
+  <li><b>Appearance:</b> System, Light or Dark.</li>
+  <li><b>App password:</b> see section 3.</li>
+</ul>
+
+<h2>15. Daily and monthly routine</h2>
+<h3>Every day</h3>
+<ul>
+  <li>Open the app once; check the corner says <span class="ui">Connected</span>.</li>
+  <li>If someone could not scan, add their punch on the Events page with a reason.</li>
+</ul>
+<h3>At the end of the month</h3>
+<ol>
+  <li><b>Timesheet:</b> clear every "Needs review" day (add missing check-outs, correct unverified times).</li>
+  <li><b>Payroll:</b> check every employee has a wage; excuse absences (sick leave) and add bonuses, deductions and advances.</li>
+  <li>Export the timesheet and payroll to Excel if you keep paper or accounting copies.</li>
+  <li>Pay the staff, then click <span class="ui">Mark month as paid</span>.</li>
+</ol>
+
+<h2>16. Troubleshooting</h2>
+<table>
+  <tr><th>Problem</th><th>What to do</th></tr>
+  <tr><td>"Not connected"</td><td>Check the terminal has power and its network light; look at the IP on its screen. Click retry. Punches stay safe on the terminal.</td></tr>
+  <tr><td>"Wrong token"</td><td>Settings → enter the token from the terminal's start-up log → Connect.</td></tr>
+  <tr><td>Terminal not found automatically</td><td>Settings → type the address shown on the terminal's screen → Connect.</td></tr>
+  <tr><td>"Not recognised" on the terminal</td><td>Try another enrolled finger; enrol more fingers for that person. Add the punch by hand if needed.</td></tr>
+  <tr><td>A day shows Incomplete</td><td>A check-out is missing: add it on the Events page.</td></tr>
+  <tr><td>"Time unverified"</td><td>The terminal lost power. Correct the time on the Events page if it is wrong.</td></tr>
+  <tr><td>Arabic text shows as boxes on the terminal</td><td>Device → Send text to device.</td></tr>
+  <tr><td>No Telegram messages</td><td>Device → Telegram alerts: check "Send alerts" is on, then Send test message and read "Last problem".</td></tr>
+  <tr><td>Wages look wrong</td><td>Check Pay rules and each wage; check the shifts (they decide lateness and overtime).</td></tr>
+  <tr><td>Forgotten app password</td><td>See the box in section 3.</td></tr>
+</table>
+</section>
+
+</body>
+</html>

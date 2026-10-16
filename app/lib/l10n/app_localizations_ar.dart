@@ -1171,4 +1171,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get wifiForgotten => 'تم نسيان شبكة الواي فاي';
+
+  @override
+  String get resetApp => 'إعادة ضبط التطبيق';
+
+  @override
+  String get resetAppHint =>
+      'يحذف كل ما يحفظه التطبيق على هذا الكمبيوتر ويبدأ من جديد كأنه مثبّت للتو.';
+
+  @override
+  String get resetAppTitle => 'إعادة ضبط التطبيق؟';
+
+  @override
+  String get resetAppBody =>
+      'سيُحذف نهائياً من هذا الكمبيوتر:\n• كل البصمات، ومنها البصمات اليدوية والتعديلات\n• الورديات والأجور وسجل الرواتب والدفعات\n• عنوان الجهاز ورمزه وكلمة مرور التطبيق وكل الإعدادات\n\nصدّر أي تقارير تحتاجها قبل المتابعة.';
+
+  @override
+  String get resetAppKeeps =>
+      'لن يتغير جهاز البصمة. يبقى عليه الموظفون وبصماتهم، والبصمات التي لا يزال يحتفظ بها تُنسخ من جديد عند إعادة الاتصال.';
+
+  @override
+  String get resetConfirmWord => 'حذف';
+
+  @override
+  String resetConfirmLabel(String word) {
+    return 'اكتب $word للتأكيد';
+  }
 }

@@ -1177,4 +1177,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wifiForgotten => 'Wi-Fi network forgotten';
+
+  @override
+  String get resetApp => 'Reset app';
+
+  @override
+  String get resetAppHint =>
+      'Deletes everything this app keeps on this computer and starts again as if newly installed.';
+
+  @override
+  String get resetAppTitle => 'Reset the app?';
+
+  @override
+  String get resetAppBody =>
+      'This permanently deletes from this computer:\n• every punch, including manual punches and edits\n• shifts, wages, payroll and payment history\n• the terminal\'s address and token, the app password and all settings\n\nExport any reports you need first.';
+
+  @override
+  String get resetAppKeeps =>
+      'The terminal is not changed. Its employees and fingerprints stay on it, and punches it still holds are copied back when you connect again.';
+
+  @override
+  String get resetConfirmWord => 'RESET';
+
+  @override
+  String resetConfirmLabel(String word) {
+    return 'Type $word to confirm';
+  }
 }

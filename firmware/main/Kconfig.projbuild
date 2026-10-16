@@ -121,6 +121,15 @@ config ATT_PIN_FPM_DETECT
     default -1 if ATT_BOARD_C3_SUPERMINI
     default 3  if ATT_BOARD_C3
 
+config ATT_TOUCH_ACTIVE_HIGH
+    bool "TTP223 output is active high"
+    default y
+    help
+        A stock TTP223 drives its output HIGH while touched (pad A open).
+        Bridging pad A makes it active low; turn this off in that case.
+        The matching internal pull (down for active high, up for active
+        low) is enabled so an unwired input reads as "not touched".
+
 config ATT_PIN_TOUCH
     int "TTP223 touch input"
     default 35 if ATT_BOARD_WROOM32

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.store" "\0"
-            VALUE "FileDescription", "attendance_admin" "\0"
+            VALUE "FileDescription", "Attendance" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "attendance_admin" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.store. All rights reserved." "\0"
             VALUE "OriginalFilename", "attendance_admin.exe" "\0"
-            VALUE "ProductName", "attendance_admin" "\0"
+            VALUE "ProductName", "Attendance" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
