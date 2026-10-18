@@ -4,7 +4,7 @@
 # which takes real objects instead.
 #
 # Usage:
-#   . .\tools\api.ps1 -Ip 192.168.137.245 -Token [device-token]
+#   . .\tools\api.ps1 -Ip 192.168.137.245 -Token <device token>
 #   Get-Info
 #   New-Employee 1
 #   Start-Enroll 1 0

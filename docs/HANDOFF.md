@@ -1,10 +1,10 @@
-﻿# Handoff
+# Handoff
 
-Attendance and departure system for a 10â€“50 staff retail store.
+Attendance and departure system for a 10–50 staff retail store.
 ESP32 terminal (fingerprint + OLED + Ethernet) plus a Flutter admin app.
 
-Read [decisions.md](decisions.md) first â€” it records *why* things are the way
-they are. [protocol.md](protocol.md) is the deviceâ†”PC contract,
+Read [decisions.md](decisions.md) first — it records *why* things are the way
+they are. [protocol.md](protocol.md) is the device↔PC contract,
 [wiring.md](wiring.md) the harness, [toolchain.md](toolchain.md) the build traps.
 
 ---
@@ -16,10 +16,10 @@ Everything below is verified on real hardware unless marked otherwise.
 
 | Subsystem | State |
 |---|---|
-| ENC28J60 Ethernet + DHCP | works, but see Â§4 â€” this is the problem area |
+| ENC28J60 Ethernet + DHCP | works, but see §4 — this is the problem area |
 | Event ring log (40,960 records) | works; survives power cycles |
-| SH1106 128Ã—64 OLED | works |
-| FPM12 fingerprint | works â€” enrols, matches, records punches |
+| SH1106 128×64 OLED | works |
+| FPM12 fingerprint | works — enrols, matches, records punches |
 | HTTP API + CORS | works; verified end to end with curl |
 | Runtime config in NVS | works; verified by writing and re-reading |
 | Arabic UI via uploaded bitmaps | works |
@@ -72,7 +72,7 @@ tests, a full end-to-end run of the real Windows build against
 ## 2. Running it
 
 ```bash
-# firmware â€” user flashes; do not run flash/monitor for them, COM3 is usually busy
+# firmware — user flashes; do not run flash/monitor for them, COM3 is usually busy
 cd "D:\New folder (3)\fingerprint_check_in_out\firmware"
 .\build.ps1 build
 .\build.ps1 flash monitor -p COM3
@@ -108,15 +108,15 @@ Two more toolchain facts, both cost time before:
 
 ### Device
 
-Token: `[device-token]` (in NVS, survives reflash; cleared by
+Token: printed once in the boot log as "generated new device token" (in NVS, survives reflash; cleared by
 `erase-flash` or a `config`/`all` reset).
-Address is DHCP and moves constantly â€” it has been on `192.168.137.x` and
+Address is DHCP and moves constantly — it has been on `192.168.137.x` and
 `192.168.0.x`. The app finds it automatically; from a shell use
-`arp -a | findstr [device-mac]`.
+`arp -a` and look for the terminal's MAC.
 
 ### Seeing the screen
 
-Do not reason about the 128Ã—64 layout in your head â€” that caused several
+Do not reason about the 128×64 layout in your head — that caused several
 rounds of shipping broken layouts.
 
 ```bash
@@ -141,7 +141,7 @@ firmware/main/      attend.c   state machine + all screen drawing
                     net_eth.c  Ethernet, DHCP fallback, wedge watchdog
                     users.c    employee/slot registry
                     timesync.c clock with provisional-time handling
-firmware/components/enc28j60/  VENDORED and patched â€” see its README
+firmware/components/enc28j60/  VENDORED and patched — see its README
 app/lib/data/       api_client, database (drift), sync_service,
                     device_scanner, name_raster, device_strings, settings
 app/lib/domain/     attendance_rules (pure calculation), timesheet,
@@ -190,19 +190,19 @@ tools/              api.ps1, screenshot.py, simulate_screen.py
   "−400.00 EGP"; without the no-break space the label wraps.
 - **Commit before ack.** `sync_service` stores punches locally *then* acks.
   Reversing that loses attendance on a crash.
-- **`draw_str` blits a 128Ã—16 bitmap when uploaded, else ASCII.** Do not invert a
-  whole strip after blitting â€” it lights every background pixel.
+- **`draw_str` blits a 128×16 bitmap when uploaded, else ASCII.** Do not invert a
+  whole strip after blitting — it lights every background pixel.
 
 ---
 
 ## 4. Open problems
 
-### ENC28J60 â€” the main one
+### ENC28J60 — the main one
 
 Four distinct faults so far: corrupted receive pointer, wedged receive, lost
 transmit interrupts, and `ECON1.TXRTS` stuck (errata #12 transmit lock-up).
 
-The INT line reads **idle high while transmits stall** â€” the chip never asserts
+The INT line reads **idle high while transmits stall** — the chip never asserts
 an interrupt. Either the NT wire to GPIO4 is bad, or it needs a 10 kÎ© pull-up
 to 3.3 V. Hardware, not software.
 
@@ -212,13 +212,13 @@ INT, plus recovers a locked transmitter itself.
 
 **Recommendation, repeatedly given and still standing: fit a W5500.** Same
 wiring, in-core ESP-IDF driver, 100 Mbps, none of these errata. Switching is a
-Kconfig flip â€” `ATT_ETH_W5500` â€” plus deleting the vendored component. A user
+Kconfig flip — `ATT_ETH_W5500` — plus deleting the vendored component. A user
 who prefers to keep the ENC28J60 has been told the cost; do not re-litigate it
 unprompted, but do report `eth_resets` climbing.
 
 ### Smaller
 
-- **Enrolment sometimes fails** with "failed to combine character files" â€” the
+- **Enrolment sometimes fails** with "failed to combine character files" — the
   two scans would not merge. Now bounded (45 s timeout, releases the device).
 - **AM/PM stays Latin in Arabic.** Needs Øµ/Ù… as two more string slots, or use
   24-hour. User was asked which; no answer yet.
@@ -243,7 +243,7 @@ Remaining, roughly in order of value:
 Done on 2026-09-30: manual punch entry, punch time correction (both on the
 Events page, reason required, audited), and the Windows build.
 
-1. **Flash the `evlog.c` fix** (built 2026-10-11, see Â§4).
+1. **Flash the `evlog.c` fix** (built 2026-10-11, see §4).
 2. **Roster editing.** `RosterEntries` is read by the resolver and covered by
    tests, but the shift editor only handles standing assignments -- no calendar
    for per-date overrides.
@@ -258,7 +258,7 @@ Events page, reason required, audited), and the Windows build.
 - **They flash the device themselves** and paste the boot log back. Hand over
   the command; do not run flash/monitor.
 - **Their logs are the best diagnostic** and have repeatedly contained the real
-  answer â€” the 240-template capacity, the INT line state, the handler-table
+  answer — the 240-template capacity, the INT line state, the handler-table
   overflow.
 - They are building a real product for a real shop. Blunt trade-offs land
   better than reassurance.
