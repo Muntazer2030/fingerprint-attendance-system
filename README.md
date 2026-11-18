@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="docs/img/terminal-3d.jpg" alt="3D render of the fingerprint attendance terminal showing the real OLED check-out screen" width="55%">
-
 # Fingerprint Attendance System
 
 **A complete check-in / check-out system for small businesses (10–50 staff):
@@ -31,11 +29,6 @@ and a daily summary.
 
 Everything is bilingual (Arabic and English, with full right-to-left layout), including the Arabic names on the
 terminal's small OLED screen.
-
-<p align="center">
-  <img src="docs/img/terminal-photo.jpg" alt="The real terminal: 3D-printed enclosure with Ethernet on top, OLED, IN/OUT touch button and fingerprint sensor" width="45%"><br>
-  <em>The working prototype: 3D-printed wall-mount enclosure with Ethernet on top, a 1.3" OLED,<br>the IN/OUT touch button and the optical fingerprint sensor.</em>
-</p>
 
 ## Features
 
