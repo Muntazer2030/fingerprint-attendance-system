@@ -26,7 +26,7 @@ def load_font():
     src = OLED.read_text(encoding="utf-8")
     body = src[src.index("static const uint8_t FONT5X7"):]
     body = body[body.index("{"): body.index("};") + 1]
-    rows = re.findall(r"\{([^{}]+)\}", body)[1:]  # first match is the outer brace
+    rows = re.findall(r"\{([^{}]+)\}", body)  # inner braces only; the outer one never matches
     glyphs = []
     for r in rows:
         vals = [int(v.strip(), 16) for v in r.split(",") if v.strip()]
